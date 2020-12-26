@@ -4,7 +4,7 @@
 - [Prerequisites](#prerequisites)
 - [Workflow](#workflow)
 - [Monitoring](#monitoring)
-- [Strong Opinions Weakly Held](#strong-opinions-weakly-held)
+- [Opinions](#opinions)
 - [TODO](#todo)
 - [Dependencies](#dependencies)
 - [References](#references)
@@ -80,7 +80,7 @@ is included for reference. When adding sidecars, you will need to adjust CPU and
 memory reservations appropriately. For Datadog, you need to reserve an additional
 256 CPU units and 512MB of memory.
 
-## Strong Opinions Weakly Held
+## Opinions
 
 Similar to popular frameworks, bootstrap time is reduced by encapsulating technical opinions.
 This gets functional infrastructure online quickly and consistently.
