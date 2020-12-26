@@ -1,20 +1,19 @@
 # Contents
 
-- [Setup](#setup)
 - [Bootstrapping](#bootstrapping)
   - [Preparation](#preparation)
-  - [Preparing Terraform](#preparing-terraform)
+  - [Create Environment](#create-environment)
   - [Remote State](#remote-state)
   - [Database Migration](#database-migration)
-- [Destroying Environments](#destroying-environments)
 
-## Setup
+## Bootstrapping
 
-Before continuing, be sure you have installed the [prerequisites]()
+This document covers additional steps required when bootstrapping new environments.
+
+Before continuing, be sure you have installed the [prerequisites](https://github.com/deadlysyn/terraform-keycloak-aws#prerequisites).
 
 Automation wraps aws-vault for security. It needs [installed and configured](https://github.com/99designs/aws-vault#quick-start),
 so be sure you have a working AWS CLI profile and have imported credentials.
-
 Once CLIs are installed and you have an AWS profile ready, export the following
 (or use something like [direnv](https://direnv.net) and a top-level `.envrc`
 to export automatically):
@@ -24,21 +23,17 @@ export AWS_REGION="<aws_region>"
 export AWS_PROFILE="<aws_profile>"
 ```
 
-The region and profile environment variables are used by Terraform as well
+The region and profile variables are used by Terraform as well
 as the the build and deploy scripts.
-
-## Bootstrapping
-
-This document covers additional steps required when bootstrapping new environments.
 
 ### Preparation
 
 The first thing to think about when preparing a new environment
 is 🐓 and 🥚. Before terraforming, we need environment-specific
 DNS, certs, and secrets. This will be clearer if you inspect
-[container_definition.json]()
+[container_definition.json](https://github.com/deadlysyn/terraform-keycloak-aws/blob/main/modules/keycloak/templates/container_definition.json)
 and
-[terraform.tfvars]().
+[terraform.tfvars](https://github.com/deadlysyn/terraform-keycloak-aws/blob/main/environments/template/template.tfvars).
 
 The first thing you need is a DNS domain to host Keycloak-related
 resource records. This could be a top-level domain specifically for this
@@ -64,7 +59,7 @@ used by the container image to set the `keycloak_admin` password on first instal
 Note that generating these secrets (30 character random strings) results
 in them being stored in state. This is why remote state with encryption is
 enabled by default. If you prefer no secrets in state, even though they are
-encrypted, you could refactor slightly to inject secrets at runtime or
+encrypted, you could refactor to inject secrets at runtime or
 simply comment the first few lines of the keycloak module which generates
 the secrets and store your own manually generated values at the same paths.
 
