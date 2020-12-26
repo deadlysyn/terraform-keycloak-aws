@@ -6,8 +6,6 @@
 - [Monitoring](#monitoring)
 - [Strong Opinions Weakly Held](#strong-opinions-weakly-held)
 - [TODO](#todo)
-- [Troubleshooting]()
-- [Upgrading]()
 - [Dependencies](#dependencies)
 - [References](#references)
 
@@ -21,7 +19,7 @@ Opinionated infrastructure and deployment automation for Keycloak.
 - Latest Keycloak (11.0.3) 😎
 - JDBC clustering and cache replication (improved HA) 🤙
 
-![Logical Diagram](https://github.com/deadlysyn/terraform-keycloak-aws/raw/master/assets/keycloak.png "Logical Diagram")
+![Logical Diagram](https://raw.githubusercontent.com/deadlysyn/terraform-keycloak-aws/main/assets/keycloak.png "Logical Diagram")
 
 Psst: [Looking for IaC for Keycloak clients?](https://github.com/deadlysyn/keycloakinator)
 
@@ -36,7 +34,8 @@ Psst: [Looking for IaC for Keycloak clients?](https://github.com/deadlysyn/keycl
 ## Workflow
 
 The basic workflow relies on make to reduce typing toil.
-If you are just getting started, refer to [the bootstrapping guide]().
+If you are just getting started, refer to
+[the bootstrapping guide](https://github.com/deadlysyn/terraform-keycloak-aws/blob/main/docs/bootstrapping.md).
 
 ```console
 $ cd environments
@@ -75,8 +74,8 @@ $ make all ENV=<env_name>
 
 Since monitoring approaches vary, I've avoided codifying monitoring-specific opinions
 to avoid adding cost and complexity. In combination with external synthetics and
-metrics, you may want to extend this with sidecar containers to provide enhanced
-monitoring. [An example of how to do that with Datadog]()
+metrics, you may want to extend this with sidecar containers to provide enhanced monitoring.
+[An example of how to do that with Datadog](https://github.com/deadlysyn/terraform-keycloak-aws/blob/main/modules/keycloak/templates/container_definition_datadog.json)
 is included for reference. When adding sidecars, you will need to adjust CPU and
 memory reservations appropriately. For Datadog, you need to reserve and additional
 256 CPU units and 512MB of memory.
@@ -100,7 +99,8 @@ understand how they work, and reason about the choices they've made. You should 
 same (be mindful of your dependencies) to understand how they can be adjusted
 if you find the defaults lacking.
 
-Dependencies are conveniently linked in [References]().
+Dependencies are conveniently linked in
+[References](https://github.com/deadlysyn/terraform-keycloak-aws#references).
 
 ### An Exception to Every Rule
 
@@ -146,14 +146,15 @@ adjusted, others require larger refactors. As time permits, we
 intend to make larger things like RDS cluster type easier to personalize,
 but have erred on the side of simplicity.
 
-The included [standalone-ha.xml]()
+The included
+[standalone-ha.xml](https://github.com/deadlysyn/terraform-keycloak-aws/blob/main/build/keycloak/standalone-ha.xml)
 and
-[docker-entrypoint.sh]()
+[docker-entrypoint.sh](https://github.com/deadlysyn/terraform-keycloak-aws/blob/main/build/keycloak/docker-entrypoint.sh)
 have been adjusted to work with ECS out of the box. These should suffice
 in most cases, but may need adjusted based on your requirements.
 You might also want to enable or disable different features, which
 are controlled in
-[profile.properties]().
+[profile.properties](https://github.com/deadlysyn/terraform-keycloak-aws/blob/main/build/keycloak/profile.properties).
 
 ## TODO
 
