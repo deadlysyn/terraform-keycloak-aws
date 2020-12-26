@@ -1,0 +1,14 @@
+.DS_Store
+.secrets
+.envrc
+.env
+.editorconfig
+README.md
+LICENSE
+.aws
+dist
+.terraform
+node_modules
+*.tfstate*
+*.plan
+*.log

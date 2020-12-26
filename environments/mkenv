@@ -1,0 +1,60 @@
+#!/bin/sh
+
+set -e
+
+# Ensure unique names for all resources.
+# Should always start with a letter.
+NAMESPACE="n$(uuidgen | cut -d- -f1 | tr '[:upper:]' '[:lower:]')"
+
+usage() {
+    cat <<EOF
+USAGE: $(basename $0) -e <environment> -r <region>
+
+  -e    name of environment to create
+  -r    AWS region to target
+EOF
+    exit 1
+}
+
+ENVIRONMENT=""; REGION=""
+while getopts e:r: ARG; do
+    case "${ARG}" in
+        e) ENVIRONMENT="$OPTARG" ;;
+        r) REGION="$OPTARG" ;;
+        *) usage ;;
+    esac
+done
+
+[ -z "${ENVIRONMENT}" ] || [ -z "${REGION}" ] && usage
+
+[ -d "./template" ] || {
+  echo "Not in environments directory?"
+  exit 1
+}
+
+[ -d "${ENVIRONMENT}" ] && {
+  echo "${ENVIRONMENT} exists, bailing."
+  exit 1
+}
+
+cp -R "./template" "./${ENVIRONMENT}"
+mv "./${ENVIRONMENT}/template.tfvars" "./${ENVIRONMENT}/terraform.tfvars"
+
+# BSD vs GNU sed
+SED_ARGS="-i"
+[ "$(uname)" = "Darwin" ] && SED_ARGS="-i ''"
+
+# eval "sed ${SED_ARGS} \
+#   -e s/%%REGION%%/${REGION}/g \
+#   -e s/%%ENVIRONMENT%%/${ENVIRONMENT}/g \
+#   -e s/%%NAMESPACE%%/${NAMESPACE}/g \
+#   ./${ENVIRONMENT}/backend.tfvars"
+
+eval "sed ${SED_ARGS} \
+  -e s/%%REGION%%/${REGION}/g \
+  -e s/%%ENVIRONMENT%%/${ENVIRONMENT}/g \
+  -e s/%%NAMESPACE%%/${NAMESPACE}/g \
+  ./${ENVIRONMENT}/terraform.tfvars"
+
+eval "${EDITOR:-vi} ${ENVIRONMENT}/terraform.tfvars"
+
