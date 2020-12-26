@@ -38,19 +38,8 @@ If you are just getting started, refer to
 [the bootstrapping guide](https://github.com/deadlysyn/terraform-keycloak-aws/blob/main/docs/bootstrapping.md).
 
 ```console
-$ cd environments
-$ make
-Manage Keycloak Infrastructure
-
-Requirements:
-  aws-vault, terraform
-
-Usage:
-  make all             create environment with remote state
-  make update          update environment
-  make destroy         destroy environment
-
 # Create new environment
+$ cd environments
 $ ./mkenv -e <env_name> -r <aws_region>
 $ cd <env_name>
 $ make all
