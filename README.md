@@ -77,15 +77,15 @@ to avoid adding cost and complexity. In combination with external synthetics and
 metrics, you may want to extend this with sidecar containers to provide enhanced monitoring.
 [An example of how to do that with Datadog](https://github.com/deadlysyn/terraform-keycloak-aws/blob/main/modules/keycloak/templates/container_definition_datadog.json)
 is included for reference. When adding sidecars, you will need to adjust CPU and
-memory reservations appropriately. For Datadog, you need to reserve and additional
+memory reservations appropriately. For Datadog, you need to reserve an additional
 256 CPU units and 512MB of memory.
 
 ## Strong Opinions Weakly Held
 
 Similar to popular frameworks, bootstrap time is reduced by encapsulating technical opinions.
-This saves you time, getting functional infrastructure online quickly and consistently.
-However, you can easily adjust these as needed so this section attempts to call out key
-design choices and how they can be modified.
+This gets functional infrastructure online quickly and consistently.
+However, you can easily adjust these as needed. This section attempts to call out key
+design choices.
 
 ### Don't Re-Invent the Wheel
 
@@ -96,9 +96,7 @@ exist improves quality and reduces maintenance overhead.
 We have contributed to many of these modules ourselves, and leverage them for
 production infrastructures. We've taken the time to read the module source,
 understand how they work, and reason about the choices they've made. You should do the
-same (be mindful of your dependencies) to understand how they can be adjusted
-if you find the defaults lacking.
-
+same to understand how they can be adjusted if you find the defaults lacking.
 Dependencies are conveniently linked in
 [References](https://github.com/deadlysyn/terraform-keycloak-aws#references).
 
@@ -109,15 +107,15 @@ is an exception to the re-use rule above. The provided network module
 is simplistic, but adequate and easy to tweak based on your requirements.
 
 However, it is meant to serve two purposes: a starting point to get new environments
-online quickly for experimentation, and interface documentation.
-Taking it's outputs as an example, you can easily provide similar inputs
-via configuration from existing infrastructure or a module of your choice.
+online quickly, and interface documentation. Taking it's outputs as an example, you
+can easily provide similar inputs via configuration from existing infrastructure or
+a module of your choice.
 
 ### Encrypt Everything
 
-Whether ALB listeners, ECR , or RDS... anything that can have encryption
+Whether ALB listeners, ECR, RDS, or remote state... anything that can have encryption
 enabled does by default. Aside from belief in the cypherpunk motto,
-this is particularly due to the fact Keycloak is a security service.
+this is due to the fact Keycloak is a security service.
 
 The one exception today is intra-VPC traffic between the ALB and ECS containers.
 Fixing this so service traffic is FULLY encrypted is on the TODO list (PRs welcome).
@@ -131,18 +129,16 @@ stores, worrying about renewals, etc.
 
 Many of the opinions represented in code come from upstream defaults.
 This reduces cognitive load for the operator. However, these are
-only opinions. You should understand upstream module defaults, and
-know that you can always override them if needed.
+only opinions that you can override if needed.
 
-Aside from leveraging sensible defaults, we also hard-code
-a few settings (e.g. DB port number) which are tunable but unlikely
+We also hard-code a few settings (e.g. DB port number) which are tunable but unlikely
 to change in the typical case. Again, these can be overridden but
 not forcing them to be thought about makes initial consumption
-easier. Power users may want to go deeper.
+easier. Power users can go deeper.
 
-Architectural choices such as "enough regions for HA"
+Several architectural choices such as "enough regions for HA"
 or "database type" are currently baked in. Some of these can be easily
-adjusted, others require larger refactors. As time permits, we
+adjusted, others require more work. As time permits, we
 intend to make larger things like RDS cluster type easier to personalize,
 but have erred on the side of simplicity.
 
@@ -150,9 +146,9 @@ The included
 [standalone-ha.xml](https://github.com/deadlysyn/terraform-keycloak-aws/blob/main/build/keycloak/standalone-ha.xml)
 and
 [docker-entrypoint.sh](https://github.com/deadlysyn/terraform-keycloak-aws/blob/main/build/keycloak/docker-entrypoint.sh)
-have been adjusted to work with ECS out of the box. These should suffice
-in most cases, but may need adjusted based on your requirements.
-You might also want to enable or disable different features, which
+have been adjusted to work with ECS out of the box. These should generally suffice,
+but may need adjusted based on your requirements.
+You might also want to toggle different feature flags, which
 are controlled in
 [profile.properties](https://github.com/deadlysyn/terraform-keycloak-aws/blob/main/build/keycloak/profile.properties).
 
