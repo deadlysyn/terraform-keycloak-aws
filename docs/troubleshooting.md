@@ -7,7 +7,7 @@
 ## Logs
 
 This project stores logs in CloudWatch. You can browse these via the AWS console,
-but also access them using a CLI from your machine.
+or access them using a CLI from your machine.
 
 To follow along you'll need:
 
@@ -30,7 +30,7 @@ your access and CLI config are working.
 
 Jump to the last example if you just want to quickly tail logs...
 There is a log group per cluster, with naming convention of
-`/aws/ecs/cluster/${namespace}-${name}-${environment}:${namespace}/${name}`.
+`/aws/ecs/cluster/${namespace}-${name}-${environment}:${environment}/${name}`.
 
 ```console
 # List log groups
@@ -42,11 +42,11 @@ RDSOSMetrics
 
 # List log streams
 $ aws-vault exec $AWS_PROFILE -- cw --region $AWS_REGION ls streams /aws/ecs/cluster/n01113a46-keycloak-test
-n01113a46/keycloak/814585f5-52da-4544-a91c-1356606611af
-n01113a46/keycloak/fe353380-f9dd-4ff4-a837-0c309f50f541
+test/keycloak/814585f5-52da-4544-a91c-1356606611af
+test/keycloak/fe353380-f9dd-4ff4-a837-0c309f50f541
 
 # Tail specific stream (isolate a specific container ID)
-$ aws-vault exec $AWS_PROFILE -- cw --region $AWS_REGION tail -f /aws/ecs/cluster/n01113a46-keycloak-test:n01113a46/keycloak/814585f5-52da-4544-a91c-1356606611af
+$ aws-vault exec $AWS_PROFILE -- cw --region $AWS_REGION tail -f /aws/ecs/cluster/n01113a46-keycloak-test:test/keycloak/814585f5-52da-4544-a91c-1356606611af
 ...
 
 # Tail all streams in group (may be noisy, since it may include sidecars)
@@ -54,7 +54,7 @@ $ aws-vault exec $AWS_PROFILE -- cw --region $AWS_REGION tail -f /aws/ecs/cluste
 ...
 
 # Tail all logs with specified stream prefix (probably what you want)
-$ aws-vault exec $AWS_PROFILE -- cw --region $AWS_REGION tail -f /aws/ecs/cluster/n01113a46-keycloak-test:n01113a46/keycloak
+$ aws-vault exec $AWS_PROFILE -- cw --region $AWS_REGION tail -f /aws/ecs/cluster/n01113a46-keycloak-test:test/keycloak
 auth-staging-keycloak 2020-10-15 19:26:35,596 INFO  [org.keycloak.storage.ldap.LDAPStorageProviderFactory] (Timer-2) Sync of federation mapper 'group' finished. Status: UserFederationSyncResult [ 0 imported groups, 116 updated groups, 0 removed groups ]
 auth-staging-keycloak 2020-10-15 19:26:35,597 INFO  [org.keycloak.storage.ldap.LDAPStorageProviderFactory] (Timer-2) Sync changed users from LDAP to local store: realm: test, federation provider: test.ldap.domain.tld, last sync time: Thu Oct 15 19:21:35 GMT 2020
 auth-staging-keycloak 2020-10-15 19:26:38,296 INFO  [org.keycloak.storage.ldap.LDAPStorageProviderFactory] (Timer-2) Sync changed users finished: 0 imported users, 0 updated users
