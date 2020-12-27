@@ -8,7 +8,7 @@ NAMESPACE="n$(uuidgen | cut -d- -f1 | tr '[:upper:]' '[:lower:]')"
 
 usage() {
     cat <<EOF
-USAGE: $(basename $0) -e <environment> -r <region>
+USAGE: $(basename $0) -e <environment> [-r <region>]
 
   -e    name of environment to create
   -r    AWS region to target
@@ -16,7 +16,7 @@ EOF
     exit 1
 }
 
-ENVIRONMENT=""; REGION=""
+ENVIRONMENT=""; REGION="${AWS_REGION}"
 while getopts e:r: ARG; do
     case "${ARG}" in
         e) ENVIRONMENT="$OPTARG" ;;
@@ -44,12 +44,6 @@ mv "./${ENVIRONMENT}/template.tfvars" "./${ENVIRONMENT}/terraform.tfvars"
 SED_ARGS="-i"
 [ "$(uname)" = "Darwin" ] && SED_ARGS="-i ''"
 
-# eval "sed ${SED_ARGS} \
-#   -e s/%%REGION%%/${REGION}/g \
-#   -e s/%%ENVIRONMENT%%/${ENVIRONMENT}/g \
-#   -e s/%%NAMESPACE%%/${NAMESPACE}/g \
-#   ./${ENVIRONMENT}/backend.tfvars"
-
 eval "sed ${SED_ARGS} \
   -e s/%%REGION%%/${REGION}/g \
   -e s/%%ENVIRONMENT%%/${ENVIRONMENT}/g \
@@ -57,4 +51,3 @@ eval "sed ${SED_ARGS} \
   ./${ENVIRONMENT}/terraform.tfvars"
 
 eval "${EDITOR:-vi} ${ENVIRONMENT}/terraform.tfvars"
-
