@@ -51,25 +51,22 @@ module "alb" {
   attributes                              = ["alb"]
   certificate_arn                         = var.alb_certificate_arn
   deletion_protection_enabled             = var.deletion_protection
-  # environment                             = var.environment
-  health_check_interval     = 60
-  health_check_path         = "/auth"
-  health_check_timeout      = 10
-  http_ingress_cidr_blocks  = ["0.0.0.0/0"]
-  http_redirect             = true
-  https_enabled             = true
-  https_ingress_cidr_blocks = ["0.0.0.0/0"]
-  lifecycle_rule_enabled    = true
-  name                      = module.label.id
-  # name                                    = var.name
-  # namespace                               = var.namespace
-  subnet_ids               = var.public_subnet_ids
-  tags                     = module.label.tags
-  target_group_name        = substr(module.label.id, 0, 31)
-  target_group_port        = var.container_port
-  target_group_target_type = "ip"
-  vpc_id                   = var.vpc_id
-  stickiness               = var.stickiness
+  health_check_interval                   = 60
+  health_check_path                       = "/auth"
+  health_check_timeout                    = 10
+  http_ingress_cidr_blocks                = ["0.0.0.0/0"]
+  http_redirect                           = true
+  https_enabled                           = true
+  https_ingress_cidr_blocks               = ["0.0.0.0/0"]
+  lifecycle_rule_enabled                  = true
+  name                                    = module.label.id
+  subnet_ids                              = var.public_subnet_ids
+  tags                                    = module.label.tags
+  target_group_name                       = substr(module.label.id, 0, 31)
+  target_group_port                       = var.container_port
+  target_group_target_type                = "ip"
+  vpc_id                                  = var.vpc_id
+  stickiness                              = var.stickiness
 }
 
 resource "aws_route53_record" "alb" {
@@ -105,8 +102,7 @@ resource "aws_ecs_cluster" "keycloak" {
 }
 
 module "ecr" {
-  source = "git::https://github.com/cloudposse/terraform-aws-ecr.git?ref=tags/0.29.1"
-  # attributes                 = ["ecr"]
+  source                     = "git::https://github.com/cloudposse/terraform-aws-ecr.git?ref=tags/0.29.1"
   encryption_configuration   = var.encryption_configuration
   max_image_count            = 3
   name                       = module.label.id
@@ -143,18 +139,15 @@ module "ecs" {
   deployment_minimum_healthy_percent = var.deployment_minimum_healthy_percent
   desired_count                      = var.desired_count
   ecs_cluster_arn                    = aws_ecs_cluster.keycloak.arn
-  # environment                        = var.environment
-  health_check_grace_period_seconds = 30
-  ignore_changes_task_definition    = false
-  name                              = module.label.id
-  # name                               = var.name
-  # namespace                          = var.namespace
-  subnet_ids             = var.private_subnet_ids
-  tags                   = module.label.tags
-  task_cpu               = var.container_cpu_units
-  task_memory            = var.container_memory_limit
-  use_alb_security_group = true
-  vpc_id                 = var.vpc_id
+  health_check_grace_period_seconds  = 30
+  ignore_changes_task_definition     = false
+  name                               = module.label.id
+  subnet_ids                         = var.private_subnet_ids
+  tags                               = module.label.tags
+  task_cpu                           = var.container_cpu_units
+  task_memory                        = var.container_memory_limit
+  use_alb_security_group             = true
+  vpc_id                             = var.vpc_id
 
   ecs_load_balancers = [
     {
@@ -194,17 +187,14 @@ module "rds_cluster" {
   deletion_protection   = var.deletion_protection
   engine                = "aurora-postgresql"
   engine_version        = var.db_engine_version
-  # environment           = var.environment
-  instance_type      = var.db_instance_type
-  maintenance_window = var.db_maintenance_window
-  name               = module.label.id
-  # name                  = var.name
-  # namespace             = var.namespace
-  retention_period  = var.db_backup_retention_days
-  security_groups   = [module.ecs.service_security_group_id]
-  source_region     = slice(var.availability_zones, 0, 1)[0]
-  storage_encrypted = true
-  subnets           = var.private_subnet_ids
-  tags              = module.label.tags
-  vpc_id            = var.vpc_id
+  instance_type         = var.db_instance_type
+  maintenance_window    = var.db_maintenance_window
+  name                  = module.label.id
+  retention_period      = var.db_backup_retention_days
+  security_groups       = [module.ecs.service_security_group_id]
+  source_region         = slice(var.availability_zones, 0, 1)[0]
+  storage_encrypted     = true
+  subnets               = var.private_subnet_ids
+  tags                  = module.label.tags
+  vpc_id                = var.vpc_id
 }
