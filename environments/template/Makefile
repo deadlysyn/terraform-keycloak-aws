@@ -57,7 +57,6 @@ destroy: destroyprep
 	$(CMD) init -force-copy
 	$(CMD) destroy -parallelism=20
 
-# NEED TO TEST
 clean: applyprep
 	@rm -f backend.tf
 	@terraform destroy
