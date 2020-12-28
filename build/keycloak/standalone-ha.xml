@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
-<server xmlns="urn:jboss:domain:13.0">
+<server xmlns="urn:jboss:domain:14.0">
     <extensions>
         <extension module="org.jboss.as.clustering.infinispan"/>
         <extension module="org.jboss.as.clustering.jgroups"/>
@@ -205,7 +205,7 @@
             </concurrent>
             <default-bindings context-service="java:jboss/ee/concurrency/context/default" datasource="java:jboss/datasources/ExampleDS" managed-executor-service="java:jboss/ee/concurrency/executor/default" managed-scheduled-executor-service="java:jboss/ee/concurrency/scheduler/default" managed-thread-factory="java:jboss/ee/concurrency/factory/default"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:ejb3:7.0">
+        <subsystem xmlns="urn:jboss:domain:ejb3:8.0">
             <session-bean>
                 <stateless>
                     <bean-instance-pool-ref pool-name="slsb-strict-max-pool"/>
@@ -232,7 +232,7 @@
                     <file-data-store name="default-file-store" path="timer-service-data" relative-to="jboss.server.data.dir"/>
                 </data-stores>
             </timer-service>
-            <remote connector-ref="http-remoting-connector" thread-pool-name="default">
+            <remote connectors="http-remoting-connector" thread-pool-name="default">
                 <channel-creation-options>
                     <option name="MAX_OUTBOUND_MESSAGES" value="1234" type="remoting"/>
                 </channel-creation-options>
@@ -248,7 +248,7 @@
             <statistics enabled="true"/>
             <log-system-exceptions value="true"/>
         </subsystem>
-        <subsystem xmlns="urn:wildfly:elytron:10.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+        <subsystem xmlns="urn:wildfly:elytron:11.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
             <providers>
                 <aggregate-providers name="combined-providers">
                     <providers name="elytron"/>
@@ -348,20 +348,20 @@
                 <provider-sasl-server-factory name="global"/>
             </sasl>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:infinispan:10.0">
+        <subsystem xmlns="urn:jboss:domain:infinispan:11.0">
             <cache-container name="keycloak" module="org.keycloak.keycloak-model-infinispan">
                 <transport lock-timeout="60000"/>
                 <local-cache name="realms">
-                    <object-memory size="10000"/>
+                    <heap-memory size="10000"/>
                 </local-cache>
                 <local-cache name="users">
-                    <object-memory size="10000"/>
+                    <heap-memory size="10000"/>
                 </local-cache>
                 <local-cache name="authorization">
-                    <object-memory size="10000"/>
+                    <heap-memory size="10000"/>
                 </local-cache>
                 <local-cache name="keys">
-                    <object-memory size="1000"/>
+                    <heap-memory size="1000"/>
                     <expiration max-idle="3600000"/>
                 </local-cache>
                 <replicated-cache name="work"/>
@@ -372,7 +372,7 @@
                 <distributed-cache name="offlineClientSessions" owners="2"/>
                 <distributed-cache name="loginFailures" owners="2"/>
                 <distributed-cache name="actionTokens" owners="2">
-                    <object-memory size="-1"/>
+                    <heap-memory size="-1"/>
                     <expiration interval="300000" max-idle="-1"/>
                 </distributed-cache>
             </cache-container>
@@ -406,12 +406,12 @@
             <cache-container name="hibernate" module="org.infinispan.hibernate-cache">
                 <transport lock-timeout="60000"/>
                 <local-cache name="local-query">
-                    <object-memory size="10000"/>
+                    <heap-memory size="10000"/>
                     <expiration max-idle="100000"/>
                 </local-cache>
                 <invalidation-cache name="entity">
                     <transaction mode="NON_XA"/>
-                    <object-memory size="10000"/>
+                    <heap-memory size="10000"/>
                     <expiration max-idle="100000"/>
                 </invalidation-cache>
                 <replicated-cache name="timestamps"/>
@@ -677,7 +677,7 @@
         <socket-binding name="txn-recovery-environment" port="4712"/>
         <socket-binding name="txn-status-manager" port="4713"/>
         <outbound-socket-binding name="mail-smtp">
-            <remote-destination host="localhost" port="25"/>
+            <remote-destination host="${jboss.mail.server.host:localhost}" port="${jboss.mail.server.port:25}"/>
         </outbound-socket-binding>
     </socket-binding-group>
 </server>
