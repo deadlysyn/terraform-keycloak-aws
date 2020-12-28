@@ -115,12 +115,11 @@ stores, worrying about renewals, etc.
 
 ### Reduce Cognitive Load
 
-Defaults are used when sensible. Some settings are hard-coded (e.g. DB port number)
-which are unlikely to change in the typical case. Many options have custom defaults
-to minimize required scope of `terraform.tfvars`. The desire is to reduce cognitive
-load, and make environments easier to reason about.
+Upstream defaults are used when sensible. Settings unlikely to change in the typical
+case have local defaults or are hard-coded (e.g. DB port number). The goal is to reduce
+cognitive load, and make environments easier to reason about.
 
-That said, these are only opinions that you can override if needed. Not forcing them
+That said, these are only opinions that you can override. Not forcing them
 to be thought about makes initial consumption easier. Power users can go deeper.
 
 The included
