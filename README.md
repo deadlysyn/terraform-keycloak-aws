@@ -73,7 +73,7 @@ memory reservations appropriately. For Datadog, you need to reserve an additiona
 
 Similar to popular frameworks, bootstrap time is reduced by encapsulating technical opinions.
 This gets functional infrastructure online quickly and consistently.
-However, you can easily adjust these as needed. This section attempts to call out key
+However, you can easily adjust these as needed. This section calls out key
 design choices.
 
 ### Don't Re-Invent the Wheel
@@ -83,19 +83,18 @@ trusted registry modules. Avoiding bespoke solutions where community-tested opti
 exist improves quality and reduces maintenance overhead.
 
 We have contributed to many of these modules ourselves, and leverage them for
-production infrastructures. We've taken the time to read the module source,
-understand how they work, and reason about the choices they've made. You should do the
-same to understand how they can be adjusted if you find the defaults lacking.
-Dependencies are conveniently linked in
+production infrastructure. We've taken the time to read the module source,
+understand how they work, and reason about the choices they've made.
+You should do the same. Dependencies are conveniently linked in
 [References](https://github.com/deadlysyn/terraform-keycloak-aws#references).
 
 ### An Exception to Every Rule
 
 While there are a number of modules to create AWS network resources, networking
 is an exception to the re-use rule above. The provided network module
-is simplistic, but adequate and easy to tweak based on your requirements.
+is simplistic, but adequate and easy to adjust based on your requirements.
 
-However, it is meant to serve two purposes: a starting point to get new environments
+It is meant to serve two purposes: a starting point to get new environments
 online quickly, and interface documentation. Taking it's outputs as an example, you
 can easily provide similar inputs via configuration from existing infrastructure or
 a module of your choice.
@@ -116,20 +115,13 @@ stores, worrying about renewals, etc.
 
 ### Reduce Cognitive Load
 
-Many of the opinions represented in code come from upstream defaults.
-This reduces cognitive load for the operator. However, these are
-only opinions that you can override if needed.
+Defaults are used when sensible. Some settings are hard-coded (e.g. DB port number)
+which are unlikely to change in the typical case. Many options have custom defaults
+to minimize required scope of `terraform.tfvars`. The desire is to reduce cognitive
+load, and make environments easier to reason about.
 
-We also hard-code a few settings (e.g. DB port number) which are tunable but unlikely
-to change in the typical case. Again, these can be overridden but
-not forcing them to be thought about makes initial consumption
-easier. Power users can go deeper.
-
-Several architectural choices such as "enough regions for HA"
-or "database type" are currently baked in. Some of these can be easily
-adjusted, others require more work. As time permits, we
-intend to make larger things like RDS cluster type easier to personalize,
-but have erred on the side of simplicity.
+That said, these are only opinions that you can override if needed. Not forcing them
+to be thought about makes initial consumption easier. Power users can go deeper.
 
 The included
 [standalone-ha.xml](https://github.com/deadlysyn/terraform-keycloak-aws/blob/main/build/keycloak/standalone-ha.xml)
