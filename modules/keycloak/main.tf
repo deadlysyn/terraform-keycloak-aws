@@ -139,7 +139,7 @@ module "ecs" {
   deployment_minimum_healthy_percent = var.deployment_minimum_healthy_percent
   desired_count                      = var.desired_count
   ecs_cluster_arn                    = aws_ecs_cluster.keycloak.arn
-  health_check_grace_period_seconds  = 30
+  health_check_grace_period_seconds  = 600
   ignore_changes_task_definition     = false
   name                               = module.label.id
   subnet_ids                         = var.private_subnet_ids
