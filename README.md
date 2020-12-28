@@ -14,20 +14,20 @@
 Opinionated infrastructure and deployment automation for Keycloak.
 
 - Batteries included (network plumbing + container build/deploy) 🚀
-- Tested with latest Terraform (<= v0.13 currently required while upstream modules are updated) 😍
+- Tested with latest Terraform 😍
 - Prefer fully-managed backing services (Fargate, Aurora, CloudWatch) 🥱
-- Latest Keycloak (11.0.3) 😎
+- Latest Keycloak (12.0.1) 😎
 - JDBC clustering and cache replication (improved HA) 🤙
 
 ![Logical Diagram](https://raw.githubusercontent.com/deadlysyn/terraform-keycloak-aws/main/assets/keycloak.png "Logical Diagram")
 
-Psst: [Looking for IaC for Keycloak clients?](https://github.com/deadlysyn/keycloakinator)
+Psst: [Need IaC for your Keycloak clients?](https://github.com/deadlysyn/keycloakinator)
 
 ## Prerequisites
 
 - [aws v2 CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
 - [aws-vault](https://github.com/99designs/aws-vault) installed and configured
-- Terraform >= v0.12
+- Terraform >= 0.12 < 0.14 (waiting on upstream PRs for 0.14 support)
 - Docker (container build/deploy)
 - UNIX-like OS (tested on Linux and MacOS)
 
