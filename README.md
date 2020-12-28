@@ -117,10 +117,7 @@ stores, worrying about renewals, etc.
 
 Upstream defaults are used when sensible. Settings unlikely to change in the typical
 case have local defaults or are hard-coded (e.g. DB port number). The goal is to reduce
-cognitive load, and make environments easier to reason about.
-
-That said, these are only opinions that you can override. Not forcing them
-to be thought about makes initial consumption easier. Power users can go deeper.
+cognitive load, but these are only opinions that you can override.
 
 The included
 [standalone-ha.xml](https://github.com/deadlysyn/terraform-keycloak-aws/blob/main/build/keycloak/standalone-ha.xml)
