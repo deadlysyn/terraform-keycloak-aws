@@ -78,7 +78,7 @@ When bootstrapping a new environment, use `mkenv`:
 
 ```console
 cd environments
-./mkenv -e <env_name> -r <aws_region>
+./mkenv -e <env_name>
 ```
 
 This will create the environment directory from a template and open an

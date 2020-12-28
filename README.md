@@ -40,7 +40,7 @@ If you are just getting started, refer to
 ```console
 # Create new environment
 $ cd environments
-$ ./mkenv -e <env_name> -r <aws_region>
+$ ./mkenv -e <env_name>
 $ cd <env_name>
 $ make all
 
@@ -138,6 +138,7 @@ are controlled in
 - Terratests
 - Test with Terraform v0.14 once upstream modules are ready
 - ALB -> ECS TLS
+- Performance test automation + baseline
 - Multi-region support
 - MySQL support
 
