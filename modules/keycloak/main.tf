@@ -1,5 +1,5 @@
 module "label" {
-  source      = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.22.1"
+  source      = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.24.1"
   environment = var.environment
   label_order = ["namespace", "name", "environment"]
   name        = var.name
@@ -46,7 +46,7 @@ resource "aws_ssm_parameter" "keycloak_password" {
 ######################################################################
 
 module "alb" {
-  source                                  = "git::https://github.com/cloudposse/terraform-aws-alb.git?ref=tags/0.24.0"
+  source                                  = "git::https://github.com/cloudposse/terraform-aws-alb.git?ref=tags/0.29.2"
   alb_access_logs_s3_bucket_force_destroy = var.alb_destroy_log_bucket
   attributes                              = ["alb"]
   certificate_arn                         = var.alb_certificate_arn
@@ -102,7 +102,7 @@ resource "aws_ecs_cluster" "keycloak" {
 }
 
 module "ecr" {
-  source                     = "git::https://github.com/cloudposse/terraform-aws-ecr.git?ref=tags/0.29.1"
+  source                     = "git::https://github.com/cloudposse/terraform-aws-ecr.git?ref=tags/0.32.1"
   encryption_configuration   = var.encryption_configuration
   max_image_count            = 3
   name                       = module.label.id
@@ -114,7 +114,7 @@ module "ecr" {
 data "aws_caller_identity" "current" {}
 
 module "ecs" {
-  source = "git::https://github.com/cloudposse/terraform-aws-ecs-alb-service-task.git?ref=tags/0.42.0"
+  source = "git::https://github.com/cloudposse/terraform-aws-ecs-alb-service-task.git?ref=tags/0.46.1"
   container_definition_json = templatefile("${path.module}/templates/container_definition.json", {
     aws_account_id            = data.aws_caller_identity.current.account_id
     container_cpu_units       = var.container_cpu_units
@@ -173,7 +173,7 @@ resource "aws_security_group_rule" "jgroups" {
 ######################################################################
 
 module "rds_cluster" {
-  source                = "git::https://github.com/cloudposse/terraform-aws-rds-cluster.git?ref=tags/0.37.1"
+  source                = "git::https://github.com/cloudposse/terraform-aws-rds-cluster.git?ref=tags/0.40.1"
   admin_password        = random_password.db_password.result
   admin_user            = "keycloak"
   allowed_cidr_blocks   = var.db_allowed_cidr_blocks
