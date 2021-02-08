@@ -158,36 +158,13 @@ resource "aws_vpc_endpoint" "ecr_dkr" {
 }
 
 resource "aws_vpc_endpoint" "s3" {
-  count       = var.internal ? 1 : 0
-  auto_accept = true
-  # policy             = aws_iam_policy.s3.policy
-  security_group_ids = [aws_security_group.vpc_endpoints.id]
-  service_name       = "com.amazonaws.${var.region}.s3"
-  subnet_ids         = var.private_subnet_ids
-  tags               = module.label.tags
-  vpc_endpoint_type  = "Interface"
-  vpc_id             = var.vpc_id
+  count           = var.internal ? 1 : 0
+  auto_accept     = true
+  route_table_ids = var.route_table_ids
+  service_name    = "com.amazonaws.${var.region}.s3"
+  tags            = module.label.tags
+  vpc_id          = var.vpc_id
 }
-
-# resource "aws_iam_policy" "s3" {
-#   name        = "vpce-s3"
-#   description = "Controls access to S3 VPC endpoint"
-#   policy      = <<EOF
-# {
-#   "Statement": [
-#     {
-#       "Sid": "Access-to-specific-bucket-only",
-#       "Principal": "*",
-#       "Action": [
-#         "s3:GetObject"
-#       ],
-#       "Effect": "Allow",
-#       "Resource": ["arn:aws:s3:::prod-${var.region}-starport-layer-bucket/*"]
-#     }
-#   ]
-# }
-# EOF
-# }
 
 resource "aws_security_group" "vpc_endpoints" {
   name        = "vpc-endpoints"
@@ -224,15 +201,14 @@ module "ecs" {
     db_addr                   = module.rds_cluster.endpoint
     dns_name                  = var.dns_name
     environment               = var.environment
-    image                     = var.internal ? "${aws_vpc_endpoint.ecr_dkr[0].dns_entry[0]["dns_name"]}/${var.name}-${var.environment}:latest" : "${module.ecr.repository_url}:latest"
-    # image        = "${module.ecr.repository_url}:latest"
-    jvm_heap_min = var.jvm_heap_min
-    jvm_heap_max = var.jvm_heap_max
-    jvm_meta_min = var.jvm_meta_min
-    jvm_meta_max = var.jvm_meta_max
-    log_group    = aws_cloudwatch_log_group.app.name
-    name         = var.name
-    region       = var.region
+    image                     = "${module.ecr.repository_url}:latest"
+    jvm_heap_min              = var.jvm_heap_min
+    jvm_heap_max              = var.jvm_heap_max
+    jvm_meta_min              = var.jvm_meta_min
+    jvm_meta_max              = var.jvm_meta_max
+    log_group                 = aws_cloudwatch_log_group.app.name
+    name                      = var.name
+    region                    = var.region
   })
   alb_security_group                 = module.alb.security_group_id
   attributes                         = ["svc"]
