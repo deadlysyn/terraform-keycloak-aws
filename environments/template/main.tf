@@ -74,6 +74,7 @@ module "keycloak" {
   public_subnet_ids                  = local.public_subnet_ids
   rds_source_region                  = local.rds_source_region
   region                             = var.region
+  route_table_ids                    = var.route_table_ids
   stickiness                         = var.stickiness
   tags                               = var.tags
   vpc_id                             = local.vpc_id
