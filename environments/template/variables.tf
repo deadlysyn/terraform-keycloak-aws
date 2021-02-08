@@ -194,6 +194,12 @@ variable "region" {
   type        = string
 }
 
+variable "route_table_ids" {
+  description = "List of route tables used by s3 VPC endpoint (if not using network module)"
+  type        = list(string)
+  default     = []
+}
+
 variable "stickiness" {
   type = object({
     cookie_duration = number
