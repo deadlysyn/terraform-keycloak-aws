@@ -17,7 +17,7 @@ deploy() {
     | docker login --username AWS --password-stdin "${REPO_HOST}"
   docker push "${REPO}:latest"
   ${VAULT} aws ecs update-service --region "${REGION}" \
-    --force-new-deployment --cluster "${IMAGE}" --service "${IMAGE}-svc"
+    --force-new-deployment --cluster "${CLUSTER}" --service "${CLUSTER}-svc"
 }
 
 usage() {
@@ -56,7 +56,8 @@ done
 if [ -e "${DIRNAME}/../../environments/${ENVIRONMENT}/backend.tf" ]; then
   OLDPWD="$PWD"
   cd "${DIRNAME}/../../environments/${ENVIRONMENT}"
-  REPO="$(terraform output ecr_repo)"
+  CLUSTER="$(terraform output -raw ecs_cluster)"
+  REPO="$(terraform output -raw ecr_repo)"
   cd "${OLDPWD}"
   REPO_HOST=$(echo "${REPO}" | cut -d/ -f1)
   IMAGE=$(echo "${REPO}" | cut -d/ -f2)
