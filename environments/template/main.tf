@@ -2,11 +2,21 @@ provider "aws" {
   region = var.region
 }
 
+resource "random_string" "namespace" {
+  length  = 8
+  special = false
+  upper   = false
+}
+
+locals {
+  namespace = "n${random_string.namespace.result}"
+}
+
 module "terraform_state_backend" {
   source                             = "git::https://github.com/cloudposse/terraform-aws-tfstate-backend.git?ref=tags/0.29.0"
   environment                        = var.environment
   name                               = var.name
-  namespace                          = var.namespace
+  namespace                          = local.namespace
   tags                               = var.tags
   terraform_backend_config_file_path = "."
   terraform_backend_config_file_name = "backend.tf"
@@ -14,6 +24,7 @@ module "terraform_state_backend" {
 }
 
 module "network" {
+  count        = var.enable_network ? 1 : 0
   source       = "../../modules/network"
   private_cidr = var.private_cidr
   public_cidr  = var.public_cidr
@@ -21,11 +32,17 @@ module "network" {
   vpc_cidr     = var.vpc_cidr
 }
 
+locals {
+  private_subnet_ids = var.enable_network ? module.network[1].private_subnet_ids : var.private_subnet_ids
+  public_subnet_ids  = var.enable_network ? module.network[1].public_subnet_cidrs : var.public_subnet_ids
+  rds_source_region  = var.enable_network ? slice(module.network[1].availability_zones, 0, 1)[0] : var.rds_source_region
+  vpc_id             = var.enable_network ? module.network[1].vpc_id : var.vpc_id
+}
+
 module "keycloak" {
   source                             = "../../modules/keycloak"
   alb_certificate_arn                = var.alb_certificate_arn
   alb_destroy_log_bucket             = var.alb_destroy_log_bucket
-  availability_zones                 = module.network.availability_zones
   container_cpu_units                = var.container_cpu_units
   container_memory_limit             = var.container_memory_limit
   container_memory_reserved          = var.container_memory_reserved
@@ -49,15 +66,15 @@ module "keycloak" {
   jvm_heap_max                       = var.jvm_heap_max
   jvm_meta_min                       = var.jvm_meta_min
   jvm_meta_max                       = var.jvm_meta_max
+  internal                           = var.internal
   log_retention_days                 = var.log_retention_days
   name                               = var.name
-  namespace                          = var.namespace
-  private_subnet_ids                 = module.network.private_subnet_ids
-  private_subnet_cidrs               = module.network.private_subnet_cidrs
-  public_subnet_ids                  = module.network.public_subnet_ids
+  namespace                          = local.namespace
+  private_subnet_ids                 = local.private_subnet_ids
+  public_subnet_ids                  = local.public_subnet_ids
+  rds_source_region                  = local.rds_source_region
   region                             = var.region
   stickiness                         = var.stickiness
   tags                               = var.tags
-  vpc_cidr                           = module.network.vpc_cidr
-  vpc_id                             = module.network.vpc_id
+  vpc_id                             = local.vpc_id
 }

@@ -7,6 +7,15 @@ module "label" {
   tags        = var.tags
 }
 
+data "aws_subnet" "selected" {
+  for_each = toset(var.private_subnet_ids)
+  id       = each.value
+}
+
+locals {
+  private_subnet_cidrs = [for s in data.aws_subnet.selected : s.cidr_block]
+}
+
 ######################################################################
 # Note these secrets end up in state. That's why we use encrypted
 # remote state by default. This could be refactored to retrieve
@@ -58,9 +67,10 @@ module "alb" {
   http_redirect                           = true
   https_enabled                           = true
   https_ingress_cidr_blocks               = ["0.0.0.0/0"]
+  internal                                = var.internal
   lifecycle_rule_enabled                  = true
   name                                    = module.label.id
-  subnet_ids                              = var.public_subnet_ids
+  subnet_ids                              = var.internal ? var.private_subnet_ids : var.public_subnet_ids
   tags                                    = module.label.tags
   target_group_name                       = substr(module.label.id, 0, 31)
   target_group_port                       = var.container_port
@@ -105,10 +115,101 @@ module "ecr" {
   source                     = "git::https://github.com/cloudposse/terraform-aws-ecr.git?ref=tags/0.32.1"
   encryption_configuration   = var.encryption_configuration
   max_image_count            = 3
-  name                       = module.label.id
+  name                       = "${var.name}-${var.environment}"
   principals_readonly_access = [module.ecs.task_role_arn]
   scan_images_on_push        = true
   tags                       = module.label.tags
+}
+
+resource "aws_vpc_endpoint" "cloudwatch_logs" {
+  count               = var.internal ? 1 : 0
+  auto_accept         = true
+  private_dns_enabled = true
+  security_group_ids  = [aws_security_group.vpc_endpoints.id]
+  service_name        = "com.amazonaws.${var.region}.logs"
+  subnet_ids          = var.private_subnet_ids
+  tags                = module.label.tags
+  vpc_endpoint_type   = "Interface"
+  vpc_id              = var.vpc_id
+}
+
+resource "aws_vpc_endpoint" "ecr_api" {
+  count               = var.internal ? 1 : 0
+  auto_accept         = true
+  private_dns_enabled = true
+  security_group_ids  = [aws_security_group.vpc_endpoints.id]
+  service_name        = "com.amazonaws.${var.region}.ecr.api"
+  subnet_ids          = var.private_subnet_ids
+  tags                = module.label.tags
+  vpc_endpoint_type   = "Interface"
+  vpc_id              = var.vpc_id
+}
+
+resource "aws_vpc_endpoint" "ecr_dkr" {
+  count               = var.internal ? 1 : 0
+  auto_accept         = true
+  private_dns_enabled = true
+  security_group_ids  = [aws_security_group.vpc_endpoints.id]
+  service_name        = "com.amazonaws.${var.region}.ecr.dkr"
+  subnet_ids          = var.private_subnet_ids
+  tags                = module.label.tags
+  vpc_endpoint_type   = "Interface"
+  vpc_id              = var.vpc_id
+}
+
+resource "aws_vpc_endpoint" "s3" {
+  count       = var.internal ? 1 : 0
+  auto_accept = true
+  # policy             = aws_iam_policy.s3.policy
+  security_group_ids = [aws_security_group.vpc_endpoints.id]
+  service_name       = "com.amazonaws.${var.region}.s3"
+  subnet_ids         = var.private_subnet_ids
+  tags               = module.label.tags
+  vpc_endpoint_type  = "Interface"
+  vpc_id             = var.vpc_id
+}
+
+# resource "aws_iam_policy" "s3" {
+#   name        = "vpce-s3"
+#   description = "Controls access to S3 VPC endpoint"
+#   policy      = <<EOF
+# {
+#   "Statement": [
+#     {
+#       "Sid": "Access-to-specific-bucket-only",
+#       "Principal": "*",
+#       "Action": [
+#         "s3:GetObject"
+#       ],
+#       "Effect": "Allow",
+#       "Resource": ["arn:aws:s3:::prod-${var.region}-starport-layer-bucket/*"]
+#     }
+#   ]
+# }
+# EOF
+# }
+
+resource "aws_security_group" "vpc_endpoints" {
+  name        = "vpc-endpoints"
+  description = "Allow traffic for PrivateLink endpoints"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    description = "TLS from VPC"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = local.private_subnet_cidrs
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = module.label.tags
 }
 
 data "aws_caller_identity" "current" {}
@@ -123,14 +224,15 @@ module "ecs" {
     db_addr                   = module.rds_cluster.endpoint
     dns_name                  = var.dns_name
     environment               = var.environment
-    image                     = "${module.ecr.repository_url}:latest"
-    jvm_heap_min              = var.jvm_heap_min
-    jvm_heap_max              = var.jvm_heap_max
-    jvm_meta_min              = var.jvm_meta_min
-    jvm_meta_max              = var.jvm_meta_max
-    log_group                 = aws_cloudwatch_log_group.app.name
-    name                      = var.name
-    region                    = var.region
+    image                     = var.internal ? "${aws_vpc_endpoint.ecr_dkr[0].dns_entry[0]["dns_name"]}/${var.name}-${var.environment}:latest" : "${module.ecr.repository_url}:latest"
+    # image        = "${module.ecr.repository_url}:latest"
+    jvm_heap_min = var.jvm_heap_min
+    jvm_heap_max = var.jvm_heap_max
+    jvm_meta_min = var.jvm_meta_min
+    jvm_meta_max = var.jvm_meta_max
+    log_group    = aws_cloudwatch_log_group.app.name
+    name         = var.name
+    region       = var.region
   })
   alb_security_group                 = module.alb.security_group_id
   attributes                         = ["svc"]
@@ -164,7 +266,7 @@ resource "aws_security_group_rule" "jgroups" {
   from_port         = 7600
   to_port           = 7600
   protocol          = "tcp"
-  cidr_blocks       = var.private_subnet_cidrs
+  cidr_blocks       = local.private_subnet_cidrs
   security_group_id = module.ecs.service_security_group_id
 }
 
@@ -192,7 +294,7 @@ module "rds_cluster" {
   name                  = module.label.id
   retention_period      = var.db_backup_retention_days
   security_groups       = [module.ecs.service_security_group_id]
-  source_region         = slice(var.availability_zones, 0, 1)[0]
+  source_region         = var.rds_source_region
   storage_encrypted     = true
   subnets               = var.private_subnet_ids
   tags                  = module.label.tags

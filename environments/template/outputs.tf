@@ -19,11 +19,11 @@ output "ecs_service" {
 }
 
 output "public_subnet_cidrs" {
-  value = module.network.public_subnet_cidrs
+  value = var.enable_network ? module.network[1].public_subnet_cidrs : ""
 }
 
 output "private_subnet_cidrs" {
-  value = module.network.private_subnet_cidrs
+  value = var.enable_network ? module.network[1].private_subnet_cidrs : ""
 }
 
 output "rds_cluster_endpoint" {

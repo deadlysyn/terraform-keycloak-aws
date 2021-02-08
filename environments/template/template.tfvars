@@ -1,17 +1,31 @@
-######################################################################
-# These are necessary as examples to get started. You could abstract
-# these away entirely by providing values as defaults, from other
-# modules, as data queries against existing infrastructure, etc.
+# Choose ONE network option, uncomment and customize variables...
 #
-# In practice, I try to keep the number of tunables in the templated
-# tfvars as minimal as possible to reduce cognitive load when needing
-# to create or adjust environments.
 ######################################################################
-
-dns_zone_id  = "<Route53 Zone ID>"
-vpc_cidr     = "10.20.30.0/24"
-public_cidr  = "10.20.30.0/25"
-private_cidr = "10.20.30.128/25"
+# Use the included network module to create a self-contained service
+# (public ALB, private container instances and DB, with VPC, subnets,
+# and everything needed for network connectivity). Simply provide
+# the desired network ranges and the module will do the rest.
+######################################################################
+#
+#vpc_cidr     = "10.20.30.0/24"
+#public_cidr  = "10.20.30.0/25"
+#private_cidr = "10.20.30.128/25"
+#
+######################################################################
+# Or disable the network module and provide required network inputs.
+# This is good if you have existing network infrastructure or want a
+# private service with no Internet connectivity.
+######################################################################
+#
+#enable_network       = false
+#private_subnet_ids   = ["subnet-foo", "subnet-bar"]
+#rds_source_region    = "us-east-1a"
+#vpc_id               = "vpc-foo"
+#
+# Either provide public subnet IDs for Internet-facing service...
+#public_subnet_ids     = ["subnet-baz", "subnet-qux"]
+# Or set internal = true for private service...
+#internal              = true
 
 ######################################################################
 # This section deserves the most attention, though adjustment is not
@@ -22,8 +36,11 @@ private_cidr = "10.20.30.128/25"
 # will be auto-adjusted.
 ######################################################################
 
-alb_certificate_arn = "<GENERATE IN ACM...>"
-dns_name            = "<SOMETHING>.sub.domain.tld"
+alb_certificate_arn = "<Generated in ACM>"
+# This is an A record pointing to the ALB...
+dns_name            = "<Keycloak service FQDN>"
+# ...in this hosted zone:
+dns_zone_id         = "<Route53 Zone ID>"
 environment         = "%%ENVIRONMENT%%"
 region              = "%%REGION%%"
 
@@ -44,9 +61,3 @@ log_retention_days                 = 5
 db_instance_type         = "db.r5.large"
 db_backup_retention_days = 5
 db_cluster_size          = 2
-
-######################################################################
-# Ensure unique names for all resources.
-######################################################################
-
-namespace = "%%NAMESPACE%%"

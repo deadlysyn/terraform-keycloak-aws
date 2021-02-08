@@ -8,15 +8,10 @@ variable "alb_destroy_log_bucket" {
   type        = bool
 }
 
-variable "availability_zones" {
-  description = "Availability zones to use"
-  type        = list(string)
+variable "rds_source_region" {
+  description = "Region of primary RDS cluster (needed to support encryption)"
+  type        = string
 }
-
-# variable "repo_image" {
-#   description = "The repo/image:version string for the container"
-#   type        = string
-# }
 
 variable "container_cpu_units" {
   description = "CPU units to reserve for container (1024 units == 1 CPU)"
@@ -122,6 +117,11 @@ variable "environment" {
   type        = string
 }
 
+variable "internal" {
+  description = "Whether environment should be exposed to Internet (if not using network module)"
+  type        = bool
+}
+
 variable "jvm_heap_min" {
   description = "Minimum JVM heap size for application in MB"
   type        = number
@@ -162,11 +162,6 @@ variable "private_subnet_ids" {
   type        = list(string)
 }
 
-variable "private_subnet_cidrs" {
-  description = "List of private subnet CIDR ranges"
-  type        = list(string)
-}
-
 variable "public_subnet_ids" {
   description = "List of public subnet IDs"
   type        = list(string)
@@ -190,12 +185,7 @@ variable "tags" {
   type        = map(string)
 }
 
-variable "vpc_cidr" {
-  description = "VPC CIDR range"
-  type        = string
-}
-
 variable "vpc_id" {
-  description = "Shared Infrastructure VPC ID"
+  description = "AWS VPC ID"
   type        = string
 }
