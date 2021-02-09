@@ -7,15 +7,6 @@ module "label" {
   tags        = var.tags
 }
 
-data "aws_subnet" "selected" {
-  for_each = toset(var.private_subnet_ids)
-  id       = each.value
-}
-
-locals {
-  private_subnet_cidrs = [for s in data.aws_subnet.selected : s.cidr_block]
-}
-
 ######################################################################
 # Note these secrets end up in state. That's why we use encrypted
 # remote state by default. This could be refactored to retrieve
@@ -177,7 +168,7 @@ resource "aws_security_group" "vpc_endpoints" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = local.private_subnet_cidrs
+    cidr_blocks = var.private_subnet_cidrs
   }
 
   egress {
@@ -243,7 +234,7 @@ resource "aws_security_group_rule" "jgroups" {
   from_port         = 7600
   to_port           = 7600
   protocol          = "tcp"
-  cidr_blocks       = local.private_subnet_cidrs
+  cidr_blocks       = var.private_subnet_cidrs
   security_group_id = module.ecs.service_security_group_id
 }
 
