@@ -34,7 +34,6 @@ done
 }
 
 cp -R "./template" "./${ENVIRONMENT}"
-mv "./${ENVIRONMENT}/template.tfvars" "./${ENVIRONMENT}/terraform.tfvars"
 
 # BSD vs GNU sed
 SED_ARGS="-i"
@@ -46,4 +45,3 @@ eval "sed ${SED_ARGS} \
   ./${ENVIRONMENT}/terraform.tfvars"
 
 eval "${EDITOR:-vi} ${ENVIRONMENT}/terraform.tfvars"
-
