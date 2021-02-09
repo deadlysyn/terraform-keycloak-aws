@@ -1,3 +1,6 @@
+#
+# !!! This section requires the most attention. !!!
+#
 # Choose ONE network option, uncomment and customize variables...
 #
 ######################################################################
@@ -20,20 +23,18 @@
 #enable_network       = false
 #private_subnet_ids   = ["subnet-foo", "subnet-bar"]
 #rds_source_region    = "us-east-1a"
-#vpc_id               = "vpc-foo"
+#route_table_ids      = ["rtb-baz"]
+#vpc_id               = "vpc-qux"
 #
-# Either provide public subnet IDs for Internet-facing service...
-#public_subnet_ids     = ["subnet-baz", "subnet-qux"]
-# Or set internal = true for private service...
+# EITHER provide public subnet IDs for Internet-facing service...
+#public_subnet_ids     = ["subnet-12345678", "subnet-90123456"]
+# OR set internal = true for private service...
 #internal              = true
 
 ######################################################################
-# This section deserves the most attention, though adjustment is not
-# strictly necessary. You can scale down to save cost. Scaling up is
-# best done by adding more tasks vs bigger tasks.
-#
-# Note that if running the Datadog sidecar, CPU and memory allocation
-# will be auto-adjusted.
+# Just plug in the missing <VALUES> and this mostly works... You can
+# scale down to save cost. Scaling is best done by adding more tasks
+# vs bigger tasks (scale out).
 ######################################################################
 
 alb_certificate_arn = "<Generated in ACM>"
@@ -44,6 +45,7 @@ dns_zone_id         = "<Route53 Zone ID>"
 environment         = "%%ENVIRONMENT%%"
 region              = "%%REGION%%"
 
+# READ THIS BEFORE CHANGING VALUES:
 # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html#task_size
 container_cpu_units                = 1024
 container_memory_limit             = 2048
