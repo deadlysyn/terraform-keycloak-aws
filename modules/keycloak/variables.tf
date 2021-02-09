@@ -117,6 +117,21 @@ variable "environment" {
   type        = string
 }
 
+variable "http_redirect" {
+  description = "Controls whether port 80 should redirect to 443 (or not listen)"
+  type        = bool
+}
+
+variable "http_ingress_cidr_blocks" {
+  description = "CIDR ranges allowed to connect to service port 80"
+  type        = bool
+}
+
+variable "https_ingress_cidr_blocks" {
+  description = "CIDR ranges allowed to connect to service port 443"
+  type        = bool
+}
+
 variable "internal" {
   description = "Whether environment should be exposed to Internet (if not using network module)"
   type        = bool

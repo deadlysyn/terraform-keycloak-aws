@@ -44,7 +44,7 @@ variable "db_backup_window" {
 variable "db_cluster_family" {
   description = "Family of DB cluster parameter group"
   type        = string
-  default     = "aurora-postgresql9.6"
+  default     = "aurora-postgresql12"
 }
 
 variable "db_cluster_size" {
@@ -55,7 +55,7 @@ variable "db_cluster_size" {
 variable "db_engine_version" {
   description = "Version of DB engine to use"
   type        = string
-  default     = "9.6.17"
+  default     = "12.4"
 }
 
 variable "db_instance_type" {
@@ -121,6 +121,24 @@ variable "encryption_configuration" {
 variable "environment" {
   description = "Environment name (development, production, etc)"
   type        = string
+}
+
+variable "http_redirect" {
+  description = "Controls whether port 80 should redirect to 443 (or not listen)"
+  type        = bool
+  default     = true
+}
+
+variable "http_ingress_cidr_blocks" {
+  description = "CIDR ranges allowed to connect to service port 80"
+  type        = bool
+  default     = ["0.0.0.0/0"]
+}
+
+variable "https_ingress_cidr_blocks" {
+  description = "CIDR ranges allowed to connect to service port 443"
+  type        = bool
+  default     = ["0.0.0.0/0"]
 }
 
 variable "internal" {

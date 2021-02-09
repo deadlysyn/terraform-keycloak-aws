@@ -63,10 +63,10 @@ module "alb" {
   health_check_interval                   = 60
   health_check_path                       = "/auth"
   health_check_timeout                    = 10
-  http_ingress_cidr_blocks                = ["0.0.0.0/0"]
-  http_redirect                           = true
+  http_ingress_cidr_blocks                = var.http_ingress_cidr_blocks
+  http_redirect                           = var.http_redirect
   https_enabled                           = true
-  https_ingress_cidr_blocks               = ["0.0.0.0/0"]
+  https_ingress_cidr_blocks               = var.https_ingress_cidr_blocks
   internal                                = var.internal
   lifecycle_rule_enabled                  = true
   name                                    = module.label.id
