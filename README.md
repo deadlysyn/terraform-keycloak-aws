@@ -16,10 +16,16 @@ Opinionated infrastructure and deployment automation for Keycloak.
 - Batteries included (network plumbing + container build/deploy) 🚀
 - Tested with latest Terraform 😍
 - Prefer fully-managed backing services (Fargate, Aurora, CloudWatch) 🥱
-- Latest Keycloak (12.0.1) 😎
+- Latest Keycloak (12.0.2) 😎
 - JDBC clustering and cache replication (improved HA) 🤙
 
 ![Logical Diagram](https://raw.githubusercontent.com/deadlysyn/terraform-keycloak-aws/main/assets/keycloak.png "Logical Diagram")
+
+NOTE: The diagram shows the default self-contained publicly-accessible service
+leveraging the included network module. You can also deploy a fully internal
+service (no Internet connectivity) or public service that uses your
+own network infrastructure. See [terraform.tfvars](https://github.com/deadlysyn/terraform-keycloak-aws/blob/main/environments/template/template.tfvars)
+for examples of how to select the right approach for your needs.
 
 Psst: [Need IaC for your Keycloak clients?](https://github.com/deadlysyn/keycloakinator)
 
@@ -27,7 +33,6 @@ Psst: [Need IaC for your Keycloak clients?](https://github.com/deadlysyn/keycloa
 
 - [aws v2 CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
 - [aws-vault](https://github.com/99designs/aws-vault) installed and configured
-- Terraform >= 0.12 < 0.14 (waiting on upstream PRs for 0.14 support)
 - Docker (container build/deploy)
 - UNIX-like OS (tested on Linux and MacOS)
 
@@ -132,7 +137,6 @@ are controlled in
 ## TODO
 
 - Terratests
-- Test with Terraform v0.14 once upstream modules are ready
 - ALB -> ECS TLS
 - Performance test automation + baseline
 - Multi-region support
@@ -164,3 +168,8 @@ Abandon hope all ye who enter here... :-)
 - https://www.keycloak.org/2019/08/keycloak-jdbc-ping
 - http://jgroups.org/manual/#JDBC_PING
 - https://octopus.com/blog/wildfly-jdbc-ping
+
+## Common Issues / FAQ
+
+Q: `The target group with targetGroupArn <arn> does not have an associated load balancer.`
+A: This is rare, but if it happens to you just re-run `make all` (double apply), perhaps waiting a few minutes in between.
