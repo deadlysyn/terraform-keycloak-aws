@@ -62,6 +62,9 @@ module "keycloak" {
   dns_zone_id                        = var.dns_zone_id
   encryption_configuration           = var.encryption_configuration
   environment                        = var.environment
+  http_redirect                      = var.http_redirect
+  http_ingress_cidr_blocks           = var.http_ingress_cidr_blocks
+  https_ingress_cidr_blocks          = var.https_ingress_cidr_blocks
   jvm_heap_min                       = var.jvm_heap_min
   jvm_heap_max                       = var.jvm_heap_max
   jvm_meta_min                       = var.jvm_meta_min
