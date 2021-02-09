@@ -21,11 +21,11 @@ Opinionated infrastructure and deployment automation for Keycloak.
 
 ![Logical Diagram](https://raw.githubusercontent.com/deadlysyn/terraform-keycloak-aws/main/assets/keycloak.png "Logical Diagram")
 
-NOTE: The diagram shows the default self-contained publicly-accessible service
+_NOTE: The diagram shows the default self-contained publicly-accessible service
 leveraging the included network module. You can also deploy a fully internal
 service (no Internet connectivity) or public service that uses your
 own network infrastructure. See [terraform.tfvars](https://github.com/deadlysyn/terraform-keycloak-aws/blob/main/environments/template/template.tfvars)
-for examples of how to select the right approach for your needs.
+for examples of how to select the right approach for your needs._
 
 Psst: [Need IaC for your Keycloak clients?](https://github.com/deadlysyn/keycloakinator)
 
