@@ -55,7 +55,7 @@ resource "aws_ssm_parameter" "keycloak_password" {
 ######################################################################
 
 module "alb" {
-  source                                  = "git::https://github.com/cloudposse/terraform-aws-alb.git?ref=tags/0.29.2"
+  source                                  = "git::https://github.com/cloudposse/terraform-aws-alb.git?ref=tags/0.29.4"
   alb_access_logs_s3_bucket_force_destroy = var.alb_destroy_log_bucket
   attributes                              = ["alb"]
   certificate_arn                         = var.alb_certificate_arn
@@ -112,7 +112,7 @@ resource "aws_ecs_cluster" "keycloak" {
 }
 
 module "ecr" {
-  source                     = "git::https://github.com/cloudposse/terraform-aws-ecr.git?ref=tags/0.32.1"
+  source                     = "git::https://github.com/cloudposse/terraform-aws-ecr.git?ref=tags/0.32.2"
   encryption_configuration   = var.encryption_configuration
   max_image_count            = 3
   name                       = "${var.name}-${var.environment}"
