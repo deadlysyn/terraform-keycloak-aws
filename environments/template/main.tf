@@ -29,11 +29,17 @@ module "network" {
   vpc_cidr     = var.vpc_cidr
 }
 
+data "aws_subnet" "selected" {
+  for_each = var.enable_network ? [] : toset(var.private_subnet_ids)
+  id       = each.value
+}
+
 locals {
-  private_subnet_ids = var.enable_network ? module.network[1].private_subnet_ids : var.private_subnet_ids
-  public_subnet_ids  = var.enable_network ? module.network[1].public_subnet_cidrs : var.public_subnet_ids
-  rds_source_region  = var.enable_network ? slice(module.network[1].availability_zones, 0, 1)[0] : var.rds_source_region
-  vpc_id             = var.enable_network ? module.network[1].vpc_id : var.vpc_id
+  private_subnet_ids   = var.enable_network ? module.network[0].private_subnet_ids : var.private_subnet_ids
+  private_subnet_cidrs = var.enable_network ? module.network[0].private_subnet_cidrs : [for s in data.aws_subnet.selected : s.cidr_block]
+  public_subnet_ids    = var.enable_network ? module.network[0].public_subnet_ids : var.public_subnet_ids
+  rds_source_region    = var.enable_network ? slice(module.network[0].availability_zones, 0, 1)[0] : var.rds_source_region
+  vpc_id               = var.enable_network ? module.network[0].vpc_id : var.vpc_id
 }
 
 module "keycloak" {
@@ -71,6 +77,7 @@ module "keycloak" {
   name                               = var.name
   namespace                          = random_string.namespace.result
   private_subnet_ids                 = local.private_subnet_ids
+  private_subnet_cidrs               = local.private_subnet_cidrs
   public_subnet_ids                  = local.public_subnet_ids
   rds_source_region                  = local.rds_source_region
   region                             = var.region
