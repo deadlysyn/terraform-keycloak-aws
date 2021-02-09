@@ -8,6 +8,7 @@
 - [TODO](#todo)
 - [Dependencies](#dependencies)
 - [References](#references)
+- [FAQ](#FAQ)
 
 ## Introduction
 
@@ -169,7 +170,12 @@ Abandon hope all ye who enter here... :-)
 - http://jgroups.org/manual/#JDBC_PING
 - https://octopus.com/blog/wildfly-jdbc-ping
 
-## Common Issues / FAQ
+## FAQ
 
 Q: `The target group with targetGroupArn <arn> does not have an associated load balancer.`
+
 A: This is rare, but if it happens to you just re-run `make all` (double apply), perhaps waiting a few minutes in between.
+
+Q: How do I get support?
+
+A: Open GitHub issues. If there's a bug you know how to fix, also open a PR and link it in your issue.
