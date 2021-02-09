@@ -124,12 +124,12 @@ variable "http_redirect" {
 
 variable "http_ingress_cidr_blocks" {
   description = "CIDR ranges allowed to connect to service port 80"
-  type        = bool
+  type        = list(string)
 }
 
 variable "https_ingress_cidr_blocks" {
   description = "CIDR ranges allowed to connect to service port 443"
-  type        = bool
+  type        = list(string)
 }
 
 variable "internal" {
