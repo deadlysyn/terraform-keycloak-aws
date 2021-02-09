@@ -114,6 +114,7 @@ resource "aws_ecs_cluster" "keycloak" {
 module "ecr" {
   source                     = "git::https://github.com/cloudposse/terraform-aws-ecr.git?ref=tags/0.32.2"
   encryption_configuration   = var.encryption_configuration
+  image_tag_mutability       = "MUTABLE"
   max_image_count            = 3
   name                       = "${var.name}-${var.environment}"
   principals_readonly_access = [module.ecs.task_role_arn]
