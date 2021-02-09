@@ -178,16 +178,16 @@ variable "name" {
   default     = "keycloak"
 }
 
-variable "private_cidr" {
-  description = "RFC1918 CIDR range for private subnets (subset of vpc_cidr)"
-  type        = string
-  default     = ""
-}
-
 variable "private_subnet_ids" {
   description = "List of private subnet IDs for deployment (if not using network module)"
   type        = list(string)
   default     = []
+}
+
+variable "private_cidr" {
+  description = "RFC1918 CIDR range for private subnets (subset of vpc_cidr)"
+  type        = string
+  default     = ""
 }
 
 variable "public_cidr" {
@@ -205,6 +205,7 @@ variable "public_subnet_ids" {
 variable "rds_source_region" {
   description = "Region of primary RDS cluster (needed to support encryption)"
   type        = string
+  default     = ""
 }
 
 variable "region" {
