@@ -177,6 +177,11 @@ variable "private_subnet_ids" {
   type        = list(string)
 }
 
+variable "private_subnet_cidrs" {
+  description = "List of private subnet CIDR ranges"
+  type        = list(string)
+}
+
 variable "public_subnet_ids" {
   description = "List of public subnet IDs"
   type        = list(string)
@@ -190,7 +195,6 @@ variable "region" {
 variable "route_table_ids" {
   description = "List of route tables used by s3 VPC endpoint (if not using network module)"
   type        = list(string)
-  default     = []
 }
 
 variable "stickiness" {
