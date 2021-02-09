@@ -4,19 +4,16 @@ provider "aws" {
 
 resource "random_string" "namespace" {
   length  = 8
+  number  = false
   special = false
   upper   = false
-}
-
-locals {
-  namespace = "n${random_string.namespace.result}"
 }
 
 module "terraform_state_backend" {
   source                             = "git::https://github.com/cloudposse/terraform-aws-tfstate-backend.git?ref=tags/0.32.1"
   environment                        = var.environment
   name                               = var.name
-  namespace                          = local.namespace
+  namespace                          = random_string.namespace.result
   tags                               = var.tags
   terraform_backend_config_file_path = "."
   terraform_backend_config_file_name = "backend.tf"
@@ -72,7 +69,7 @@ module "keycloak" {
   internal                           = var.internal
   log_retention_days                 = var.log_retention_days
   name                               = var.name
-  namespace                          = local.namespace
+  namespace                          = random_string.namespace.result
   private_subnet_ids                 = local.private_subnet_ids
   public_subnet_ids                  = local.public_subnet_ids
   rds_source_region                  = local.rds_source_region
