@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
-<server xmlns="urn:jboss:domain:14.0">
+<server xmlns="urn:jboss:domain:16.0">
     <extensions>
         <extension module="org.jboss.as.clustering.infinispan"/>
         <extension module="org.jboss.as.clustering.jgroups"/>
@@ -22,10 +22,9 @@
         <extension module="org.wildfly.extension.bean-validation"/>
         <extension module="org.wildfly.extension.core-management"/>
         <extension module="org.wildfly.extension.elytron"/>
+        <extension module="org.wildfly.extension.health"/>
         <extension module="org.wildfly.extension.io"/>
-        <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
-        <extension module="org.wildfly.extension.microprofile.health-smallrye"/>
-        <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
+        <extension module="org.wildfly.extension.metrics"/>
         <extension module="org.wildfly.extension.request-controller"/>
         <extension module="org.wildfly.extension.security.manager"/>
         <extension module="org.wildfly.extension.undertow"/>
@@ -130,14 +129,6 @@
         <subsystem xmlns="urn:jboss:domain:core-management:1.0"/>
         <subsystem xmlns="urn:jboss:domain:datasources:6.0">
             <datasources>
-                <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true" statistics-enabled="${wildfly.datasources.statistics-enabled:${wildfly.statistics-enabled:false}}">
-                    <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE</connection-url>
-                    <driver>h2</driver>
-                    <security>
-                        <user-name>sa</user-name>
-                        <password>sa</password>
-                    </security>
-                </datasource>
                 <datasource jndi-name="java:jboss/datasources/KeycloakDS" pool-name="KeycloakDS" enabled="true" use-java-context="true" statistics-enabled="${wildfly.datasources.statistics-enabled:${wildfly.statistics-enabled:false}}">
                     <connection-url>jdbc:postgresql://${env.DB_ADDR}/keycloak</connection-url>
                     <connection-property name="ssl">
@@ -187,7 +178,7 @@
         <subsystem xmlns="urn:jboss:domain:deployment-scanner:2.0">
             <deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000" runtime-failure-causes-rollback="${jboss.deployment.scanner.rollback.on.failure:false}"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:ee:5.0">
+        <subsystem xmlns="urn:jboss:domain:ee:6.0">
             <spec-descriptor-property-replacement>false</spec-descriptor-property-replacement>
             <concurrent>
                 <context-services>
@@ -197,15 +188,15 @@
                     <managed-thread-factory name="default" jndi-name="java:jboss/ee/concurrency/factory/default" context-service="default"/>
                 </managed-thread-factories>
                 <managed-executor-services>
-                    <managed-executor-service name="default" jndi-name="java:jboss/ee/concurrency/executor/default" context-service="default" hung-task-threshold="60000" keepalive-time="5000"/>
+                    <managed-executor-service name="default" jndi-name="java:jboss/ee/concurrency/executor/default" context-service="default" hung-task-termination-period="0" hung-task-threshold="60000" keepalive-time="5000"/>
                 </managed-executor-services>
                 <managed-scheduled-executor-services>
-                    <managed-scheduled-executor-service name="default" jndi-name="java:jboss/ee/concurrency/scheduler/default" context-service="default" hung-task-threshold="60000" keepalive-time="3000"/>
+                    <managed-scheduled-executor-service name="default" jndi-name="java:jboss/ee/concurrency/scheduler/default" context-service="default" hung-task-termination-period="0" hung-task-threshold="60000" keepalive-time="3000"/>
                 </managed-scheduled-executor-services>
             </concurrent>
-            <default-bindings context-service="java:jboss/ee/concurrency/context/default" datasource="java:jboss/datasources/ExampleDS" managed-executor-service="java:jboss/ee/concurrency/executor/default" managed-scheduled-executor-service="java:jboss/ee/concurrency/scheduler/default" managed-thread-factory="java:jboss/ee/concurrency/factory/default"/>
+            <default-bindings context-service="java:jboss/ee/concurrency/context/default" managed-executor-service="java:jboss/ee/concurrency/executor/default" managed-scheduled-executor-service="java:jboss/ee/concurrency/scheduler/default" managed-thread-factory="java:jboss/ee/concurrency/factory/default"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:ejb3:8.0">
+        <subsystem xmlns="urn:jboss:domain:ejb3:9.0">
             <session-bean>
                 <stateless>
                     <bean-instance-pool-ref pool-name="slsb-strict-max-pool"/>
@@ -248,7 +239,7 @@
             <statistics enabled="true"/>
             <log-system-exceptions value="true"/>
         </subsystem>
-        <subsystem xmlns="urn:wildfly:elytron:11.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
+        <subsystem xmlns="urn:wildfly:elytron:13.0" final-providers="combined-providers" disallowed-providers="OracleUcrypto">
             <providers>
                 <aggregate-providers name="combined-providers">
                     <providers name="elytron"/>
@@ -347,9 +338,27 @@
                 </mechanism-provider-filtering-sasl-server-factory>
                 <provider-sasl-server-factory name="global"/>
             </sasl>
+            <tls>
+                <key-stores>
+                    <key-store name="applicationKS">
+                        <credential-reference clear-text="password"/>
+                        <implementation type="JKS"/>
+                        <file path="application.keystore" relative-to="jboss.server.config.dir"/>
+                    </key-store>
+                </key-stores>
+                <key-managers>
+                    <key-manager name="applicationKM" key-store="applicationKS" generate-self-signed-certificate-host="localhost">
+                        <credential-reference clear-text="password"/>
+                    </key-manager>
+                </key-managers>
+                <server-ssl-contexts>
+                    <server-ssl-context name="applicationSSC" key-manager="applicationKM"/>
+                </server-ssl-contexts>
+            </tls>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:infinispan:11.0">
-            <cache-container name="keycloak" module="org.keycloak.keycloak-model-infinispan">
+        <subsystem xmlns="urn:wildfly:health:1.0" security-enabled="false"/>
+        <subsystem xmlns="urn:jboss:domain:infinispan:12.0">
+            <cache-container name="keycloak" modules="org.keycloak.keycloak-model-infinispan">
                 <transport lock-timeout="60000"/>
                 <local-cache name="realms">
                     <heap-memory size="10000"/>
@@ -364,27 +373,41 @@
                     <heap-memory size="1000"/>
                     <expiration max-idle="3600000"/>
                 </local-cache>
-                <replicated-cache name="work"/>
-                <distributed-cache name="sessions" owners="2"/>
-                <distributed-cache name="authenticationSessions" owners="2"/>
-                <distributed-cache name="offlineSessions" owners="2"/>
-                <distributed-cache name="clientSessions" owners="2"/>
-                <distributed-cache name="offlineClientSessions" owners="2"/>
-                <distributed-cache name="loginFailures" owners="2"/>
+                <replicated-cache name="work" remote-timeout="60000">
+                    <expiration lifespan="900000000000000000"/>
+                </replicated-cache>
+                <distributed-cache name="sessions" owners="2">
+                    <expiration lifespan="900000000000000000"/>
+                </distributed-cache>
+                <distributed-cache name="authenticationSessions" owners="2">
+                    <expiration lifespan="900000000000000000"/>
+                </distributed-cache>
+                <distributed-cache name="offlineSessions" owners="2">
+                    <expiration lifespan="900000000000000000"/>
+                </distributed-cache>
+                <distributed-cache name="clientSessions" owners="2">
+                    <expiration lifespan="900000000000000000"/>
+                </distributed-cache>
+                <distributed-cache name="offlineClientSessions" owners="2">
+                    <expiration lifespan="900000000000000000"/>
+                </distributed-cache>
+                <distributed-cache name="loginFailures" owners="2">
+                    <expiration lifespan="900000000000000000"/>
+                </distributed-cache>
                 <distributed-cache name="actionTokens" owners="2">
                     <heap-memory size="-1"/>
-                    <expiration interval="300000" max-idle="-1"/>
+                    <expiration interval="300000" lifespan="900000000000000000" max-idle="-1"/>
                 </distributed-cache>
             </cache-container>
-            <cache-container name="server" aliases="singleton cluster" default-cache="default" module="org.wildfly.clustering.server">
+            <cache-container name="server" default-cache="default" aliases="singleton cluster" modules="org.wildfly.clustering.server">
                 <transport lock-timeout="60000"/>
-                <replicated-cache name="default">
+                <replicated-cache name="default" remote-timeout="60000">
                     <transaction mode="BATCH"/>
                 </replicated-cache>
             </cache-container>
-            <cache-container name="web" default-cache="dist" module="org.wildfly.clustering.web.infinispan">
+            <cache-container name="web" default-cache="dist" modules="org.wildfly.clustering.web.infinispan">
                 <transport lock-timeout="60000"/>
-                <replicated-cache name="sso">
+                <replicated-cache name="sso" remote-timeout="60000">
                     <locking isolation="REPEATABLE_READ"/>
                     <transaction mode="BATCH"/>
                 </replicated-cache>
@@ -395,7 +418,7 @@
                 </distributed-cache>
                 <distributed-cache name="routing"/>
             </cache-container>
-            <cache-container name="ejb" aliases="sfsb" default-cache="dist" module="org.wildfly.clustering.ejb.infinispan">
+            <cache-container name="ejb" default-cache="dist" aliases="sfsb" modules="org.wildfly.clustering.ejb.infinispan">
                 <transport lock-timeout="60000"/>
                 <distributed-cache name="dist">
                     <locking isolation="REPEATABLE_READ"/>
@@ -403,7 +426,7 @@
                     <file-store/>
                 </distributed-cache>
             </cache-container>
-            <cache-container name="hibernate" module="org.infinispan.hibernate-cache">
+            <cache-container name="hibernate" modules="org.infinispan.hibernate-cache">
                 <transport lock-timeout="60000"/>
                 <local-cache name="local-query">
                     <heap-memory size="10000"/>
@@ -414,7 +437,7 @@
                     <heap-memory size="10000"/>
                     <expiration max-idle="100000"/>
                 </invalidation-cache>
-                <replicated-cache name="timestamps"/>
+                <replicated-cache name="timestamps" remote-timeout="60000"/>
             </cache-container>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:io:3.0">
@@ -451,8 +474,8 @@
                     <protocol type="org.jgroups.protocols.JDBC_PING">
                         <property name="datasource_jndi_name">java:jboss/datasources/KeycloakDS</property>
                         <property name="remove_old_coords_on_view_change">true</property>
-                        <property name="info_writer_sleep_time">1000</property>
-                        <property name="info_writer_max_writes_after_view">3</property>
+                        <property name="info_writer_sleep_time">5000</property>
+                        <property name="info_writer_max_writes_after_view">2</property>
                         <property name="initialize_sql">CREATE TABLE IF NOT EXISTS JGROUPSPING (own_addr varchar(200) NOT NULL,bind_addr varchar(200) NOT NULL,created timestamp NOT NULL,cluster_name varchar(200) NOT NULL,ping_data BYTEA,constraint PK_JGROUPSPING PRIMARY KEY (own_addr, cluster_name));</property>
                         <property name="insert_single_sql">INSERT INTO JGROUPSPING (own_addr, bind_addr, created, cluster_name, ping_data) values (?,'${env.EXTERNAL_ADDR:127.0.0.1}',NOW(), ?, ?);</property>
                         <property name="delete_single_sql">DELETE FROM JGROUPSPING WHERE own_addr=? AND cluster_name=?;</property>
@@ -477,7 +500,7 @@
             <remoting-connector/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:jpa:1.1">
-            <jpa default-datasource="" default-extended-persistence-inheritance="DEEP"/>
+            <jpa default-extended-persistence-inheritance="DEEP"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:keycloak-server:1.1">
             <web-context>auth</web-context>
@@ -571,9 +594,7 @@
                 <smtp-server outbound-socket-binding-ref="mail-smtp"/>
             </mail-session>
         </subsystem>
-        <subsystem xmlns="urn:wildfly:microprofile-config-smallrye:1.0"/>
-        <subsystem xmlns="urn:wildfly:microprofile-health-smallrye:2.0" security-enabled="false" empty-liveness-checks-status="${env.MP_HEALTH_EMPTY_LIVENESS_CHECKS_STATUS:UP}" empty-readiness-checks-status="${env.MP_HEALTH_EMPTY_READINESS_CHECKS_STATUS:UP}"/>
-        <subsystem xmlns="urn:wildfly:microprofile-metrics-smallrye:2.0" security-enabled="false" exposed-subsystems="*" prefix="${wildfly.metrics.prefix:wildfly}"/>
+        <subsystem xmlns="urn:wildfly:metrics:1.0" security-enabled="false" exposed-subsystems="*" prefix="${wildfly.metrics.prefix:wildfly}"/>
         <subsystem xmlns="urn:jboss:domain:naming:2.0">
             <remote-naming/>
         </subsystem>
@@ -620,7 +641,7 @@
                 </maximum-set>
             </deployment-permissions>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:transactions:5.0">
+        <subsystem xmlns="urn:jboss:domain:transactions:6.0">
             <core-environment node-identifier="${env.EXTERNAL_ADDR}">
                 <process-id>
                     <uuid/>
@@ -630,7 +651,7 @@
             <coordinator-environment statistics-enabled="true"/>
             <object-store path="tx-object-store" relative-to="jboss.server.data.dir"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:undertow:11.0" default-server="default-server" default-virtual-host="default-host" default-servlet-container="default" default-security-domain="other" statistics-enabled="${wildfly.undertow.statistics-enabled:${wildfly.statistics-enabled:false}}">
+        <subsystem xmlns="urn:jboss:domain:undertow:12.0" default-server="default-server" default-virtual-host="default-host" default-servlet-container="default" default-security-domain="other" statistics-enabled="${wildfly.undertow.statistics-enabled:${wildfly.statistics-enabled:false}}">
             <buffer-cache name="default"/>
             <server name="default-server">
                 <ajp-listener name="ajp" socket-binding="ajp"/>
