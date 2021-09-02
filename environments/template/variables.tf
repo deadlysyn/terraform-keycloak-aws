@@ -226,8 +226,8 @@ variable "stickiness" {
   })
   description = "Target group sticky configuration"
   default = {
-    cookie_duration = 14440 # 4 hrs
-    enabled         = true
+    cookie_duration = null
+    enabled         = false
   }
 }
 
