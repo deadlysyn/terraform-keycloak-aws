@@ -54,7 +54,7 @@
       },
       {
         "name": "JAVA_OPTS",
-        "value": "-Xms${jvm_heap_min}m -Xmx${jvm_heap_max}m -XX:MetaspaceSize=${jvm_meta_min}m -XX:MaxMetaspaceSize=${jvm_meta_max}m -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses -Djava.security.egd=file:/dev/urandom"
+        "value": "-XX:+DisableExplicitGC -XX:+UseG1GC -Xms${jvm_heap_min}m -Xmx${jvm_heap_max}m -XX:MetaspaceSize=${jvm_meta_min}m -XX:MaxMetaspaceSize=${jvm_meta_max}m -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses -Djava.security.egd=file:/dev/urandom -Dnashorn.args=--no-deprecation-warning"
       },
       {
         "name": "KEYCLOAK_DEFAULT_THEME",
