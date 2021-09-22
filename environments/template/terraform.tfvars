@@ -60,6 +60,6 @@ desired_count                      = 2 # ECS tasks
 log_retention_days                 = 5
 
 # https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.DBInstanceClass.html
-db_instance_type         = "db.r5.large"
+db_instance_type         = "db.r6g.large"
 db_backup_retention_days = 5
 db_cluster_size          = 2
