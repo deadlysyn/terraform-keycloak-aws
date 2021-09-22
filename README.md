@@ -17,7 +17,7 @@ Opinionated infrastructure and deployment automation for Keycloak.
 - Batteries included (network plumbing + container build/deploy) 🚀
 - Tested with latest Terraform 😍
 - Prefer fully-managed backing services (Fargate, Aurora, CloudWatch) 🥱
-- Latest Keycloak (12.0.2) 😎
+- Latest Keycloak (15.0.2) 😎
 - JDBC clustering and cache replication (improved HA) 🤙
 
 ![Logical Diagram](https://raw.githubusercontent.com/deadlysyn/terraform-keycloak-aws/main/assets/keycloak.png "Logical Diagram")
@@ -25,7 +25,7 @@ Opinionated infrastructure and deployment automation for Keycloak.
 _NOTE: The diagram shows the default self-contained publicly-accessible service
 leveraging the included network module. You can also deploy a fully internal
 service (no Internet connectivity) or public service that uses your
-own network infrastructure. See [terraform.tfvars](https://github.com/deadlysyn/terraform-keycloak-aws/blob/main/environments/template/template.tfvars)
+own network infrastructure. See [terraform.tfvars](https://github.com/deadlysyn/terraform-keycloak-aws/blob/main/environments/template/terraform.tfvars)
 for examples of how to select the right approach for your needs._
 
 Psst: [Need IaC for your Keycloak clients?](https://github.com/deadlysyn/keycloakinator)
