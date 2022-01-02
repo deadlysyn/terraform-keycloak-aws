@@ -1,5 +1,8 @@
 # Contents
 
+**NOTE:** I spin releases for the latest Keycloak versions avoiding ".0"
+e.g. 15.1.1+ but not 15.1.0.
+
 - [Introduction](#introduction)
 - [Prerequisites](#prerequisites)
 - [Workflow](#workflow)
