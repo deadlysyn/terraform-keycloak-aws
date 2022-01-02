@@ -39,11 +39,11 @@
 
 alb_certificate_arn = "<Generated in ACM>"
 # This is an A record pointing to the ALB...
-dns_name            = "<Keycloak service FQDN>"
+dns_name = "<Keycloak service FQDN>"
 # ...in this hosted zone:
-dns_zone_id         = "<Route53 Zone ID>"
-environment         = "%%ENVIRONMENT%%"
-region              = "%%REGION%%"
+dns_zone_id = "<Route53 Zone ID>"
+environment = "%%ENVIRONMENT%%"
+region      = "%%REGION%%"
 
 # READ THIS BEFORE CHANGING VALUES:
 # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html#task_size

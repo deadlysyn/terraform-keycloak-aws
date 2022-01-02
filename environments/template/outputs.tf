@@ -39,7 +39,8 @@ output "rds_cluster_database_name" {
 }
 
 output "rds_cluster_master_username" {
-  value = module.keycloak.rds_cluster_master_username
+  value     = module.keycloak.rds_cluster_master_username
+  sensitive = true
 }
 
 output "state_table" {
