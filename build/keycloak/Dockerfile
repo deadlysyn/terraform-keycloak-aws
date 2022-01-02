@@ -1,4 +1,4 @@
-FROM jboss/keycloak:15.0.2
+FROM jboss/keycloak:15.1.1
 
 USER root
 
@@ -31,6 +31,11 @@ ENV CACHE_OWNERS_COUNT 2
 ENV CACHE_OWNERS_AUTH_SESSIONS_COUNT 2
 # https://github.com/keycloak/keycloak-containers/blob/master/server/README.md#enabling-proxy-address-forwarding
 ENV PROXY_ADDRESS_FORWARDING true
+
+# Paranoia: Keycloak is not vulnerable to CVE-2021-44228
+# https://github.com/keycloak/keycloak-containers/issues/344
+# https://logging.apache.org/log4j/log4j-2.14.1/manual/configuration.html#SystemProperties
+ENV FORMAT_MESSAGES_PATTERN_DISABLE_LOOKUPS true
 
 EXPOSE 7600
 CMD ["-b", "0.0.0.0", "--server-config", "standalone-ha.xml"]
