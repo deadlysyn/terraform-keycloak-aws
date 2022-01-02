@@ -1,8 +1,5 @@
 # Contents
 
-**NOTE:** I spin releases for the latest Keycloak versions avoiding "dot ohs"
-e.g. 15.1.1+ but not 15.1.0.
-
 - [Introduction](#introduction)
 - [Prerequisites](#prerequisites)
 - [Workflow](#workflow)
@@ -14,6 +11,9 @@ e.g. 15.1.1+ but not 15.1.0.
 - [FAQ](#FAQ)
 
 ## Introduction
+
+**NOTE:** I spin releases for the latest Keycloak versions avoiding "dot ohs"
+e.g. 15.1.1+ but not 15.1.0.
 
 Opinionated infrastructure and deployment automation for Keycloak.
 
