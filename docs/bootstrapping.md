@@ -41,7 +41,7 @@ purpose (e.g. `domain.tld`), or a sub-domain of an existing zone (e.g. `sso.doma
 Aside from purchasing the domain, you need to have it delegated to Route53
 (when you create a Route53 hosted zone, you will be assigned a set of name servers
 you can use to update the domain with your registrar). Once configured, Terraform
-will manage service-specific entires in the hosted zone specified in `terraform.tfvars`.
+will manage service-specific entries in the hosted zone specified in `terraform.tfvars`.
 
 Once a domain is configured, jump to ACM and request a cert
 for the new environment. Be sure to make the request in the region where you
