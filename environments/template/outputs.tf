@@ -23,7 +23,7 @@ output "public_subnet_cidrs" {
 }
 
 output "private_subnet_cidrs" {
-  value = var.enable_network ? module.network[0].private_subnet_cidrs : []
+  value = var.enable_network ? module.network[0].private_subnet_cidrs : local.private_subnet_cidrs
 }
 
 output "rds_cluster_endpoint" {
