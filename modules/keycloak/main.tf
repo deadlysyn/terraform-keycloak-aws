@@ -149,48 +149,37 @@ resource "aws_vpc_endpoint" "ecr_dkr" {
   vpc_id              = var.vpc_id
 }
 
-/* resource "aws_vpc_endpoint" "s3" { */
-/*   count           = var.internal ? 1 : 0 */
-/*   auto_accept     = true */
-/*   route_table_ids = var.route_table_ids */
-/*   service_name    = "com.amazonaws.${var.region}.s3" */
-/*   tags            = module.label.tags */
-/*   vpc_id          = var.vpc_id */
-/* } */
-
 resource "aws_vpc_endpoint" "s3" {
   count           = var.internal ? 1 : 0
   auto_accept     = true
-  security_group_ids  = [aws_security_group.vpc_endpoints.id]
+  route_table_ids = var.route_table_ids
   service_name    = "com.amazonaws.${var.region}.s3"
-  subnet_ids          = var.private_subnet_ids
   tags            = module.label.tags
-  vpc_endpoint_type   = "Interface"
   vpc_id          = var.vpc_id
 }
 
 resource "aws_vpc_endpoint" "ssm" {
-  count           = var.internal ? 1 : 0
-  auto_accept     = true
+  count               = var.internal ? 1 : 0
+  auto_accept         = true
   private_dns_enabled = true
   security_group_ids  = [aws_security_group.vpc_endpoints.id]
-  service_name    = "com.amazonaws.${var.region}.ssm"
+  service_name        = "com.amazonaws.${var.region}.ssm"
   subnet_ids          = var.private_subnet_ids
-  tags            = module.label.tags
+  tags                = module.label.tags
   vpc_endpoint_type   = "Interface"
-  vpc_id          = var.vpc_id
+  vpc_id              = var.vpc_id
 }
 
 resource "aws_vpc_endpoint" "ssm_messages" {
-  count           = var.internal ? 1 : 0
-  auto_accept     = true
+  count               = var.internal ? 1 : 0
+  auto_accept         = true
   private_dns_enabled = true
   security_group_ids  = [aws_security_group.vpc_endpoints.id]
-  service_name    = "com.amazonaws.${var.region}.ssmmessages"
+  service_name        = "com.amazonaws.${var.region}.ssmmessages"
   subnet_ids          = var.private_subnet_ids
-  tags            = module.label.tags
+  tags                = module.label.tags
   vpc_endpoint_type   = "Interface"
-  vpc_id          = var.vpc_id
+  vpc_id              = var.vpc_id
 }
 
 resource "aws_security_group" "vpc_endpoints" {
@@ -199,11 +188,11 @@ resource "aws_security_group" "vpc_endpoints" {
   vpc_id      = var.vpc_id
 
   ingress {
-    description = "TLS from VPC"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = var.private_subnet_cidrs
+    description     = "TLS from VPC"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    security_groups = [module.ecs.service_security_group_id]
   }
 
   egress {
