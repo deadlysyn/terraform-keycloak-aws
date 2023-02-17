@@ -52,7 +52,7 @@ module "alb" {
   certificate_arn                         = var.alb_certificate_arn
   deletion_protection_enabled             = var.deletion_protection
   health_check_interval                   = 60
-  health_check_path                       = "/auth"
+  health_check_path                       = "/auth/health"
   health_check_timeout                    = 10
   http_ingress_cidr_blocks                = var.http_ingress_cidr_blocks
   http_redirect                           = var.http_redirect
@@ -253,10 +253,10 @@ module "ecs" {
   ]
 }
 
-resource "aws_security_group_rule" "jgroups" {
+resource "aws_security_group_rule" "jdbc_ping" {
   type              = "ingress"
-  from_port         = 7600
-  to_port           = 7600
+  from_port         = 7800
+  to_port           = 7800
   protocol          = "tcp"
   cidr_blocks       = var.private_subnet_cidrs
   security_group_id = module.ecs.service_security_group_id

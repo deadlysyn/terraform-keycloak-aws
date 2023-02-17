@@ -17,44 +17,10 @@ if [ -z "${EXTERNAL_ADDR}" ]; then
 fi
 export EXTERNAL_ADDR
 
-# Add admin user
-if [ -n "${KEYCLOAK_USER}" ] && [ -n "${KEYCLOAK_PASSWORD}" ]; then
-  /opt/jboss/keycloak/bin/add-user-keycloak.sh --user "${KEYCLOAK_USER}" --password "${KEYCLOAK_PASSWORD}"
-fi
-
-# Default to H2 if DB type not detected
-if [ -z "${DB_VENDOR}" ]; then
-  export DB_VENDOR="h2"
-fi
-
-# Set DB name
-DB_VENDOR=$(echo "${DB_VENDOR}" | tr '[:upper:]' '[:lower:]')
-case "${DB_VENDOR}" in
-  h2)
-    DB_NAME="Embedded H2" ;;
-  mariadb)
-    DB_NAME="MariaDB" ;;
-  mysql)
-    DB_NAME="MySQL" ;;
-  postgres)
-    DB_NAME="PostgreSQL" ;;
-  *)
-    echo "Unknown DB vendor ${DB_VENDOR}"
-    exit 1
-esac
-echo "Using ${DB_NAME} database"
-
-if [ "${DB_VENDOR}" != "h2" ]; then
-  /bin/sh /opt/jboss/tools/databases/change-database.sh "${DB_VENDOR}"
-fi
 
 if [ -z "${HOSTNAME}" ]; then
   HOSTNAME="localhost"
 fi
 
-SYS_PROPS="-Dkeycloak.hostname.provider=fixed \
-  -Dkeycloak.hostname.fixed.hostname=${HOSTNAME} \
-  -Dkeycloak.hostname.fixed.httpPort=8080"
-
-exec /opt/jboss/keycloak/bin/standalone.sh "${SYS_PROPS}" "$@"
+exec /opt/keycloak/bin/kc.sh start --optimized "$@"
 exit $?

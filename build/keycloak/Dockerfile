@@ -1,41 +1,56 @@
-FROM jboss/keycloak:15.1.1
+##################################################
+# Step 1 - Build an optimized image
+##################################################
+FROM quay.io/keycloak/keycloak:20.0.3 as builder
 
-USER root
+# These options can be modified to produce a different
+# optimized build.
+#
+# See  https://www.keycloak.org/server/containers
+# for more details.
+ENV KC_METRICS_ENABLED=true
+ENV KC_HEALTH_ENABLED=true
+ENV KC_FEATURES=preview
+ENV KC_DB=postgres
+ENV KC_HTTP_RELATIVE_PATH=/auth
+
+# # Clustering
+# (https://gist.github.com/xgp/768eea11f92806b9c83f95902f7f8f80)
+COPY ./cache-ispn-jdbc-ping.xml /opt/keycloak/conf/cache-ispn-jdbc-ping.xml
+ENV KC_CACHE_CONFIG_FILE=cache-ispn-jdbc-ping.xml
+
+# Install custom themes
+COPY themes/ /opt/keycloak/themes
+
+# Create an optimized build
+RUN /opt/keycloak/bin/kc.sh build
+
+##################################################
+# Step 2 - Copy optimized build into running image
+##################################################
+FROM quay.io/keycloak/keycloak:20.0.3
 
 # parses ecs metadata
+USER root
 RUN microdnf update -y && \
     microdnf install -y jq && \
     microdnf clean all
 
-USER jboss
+USER keycloak
+COPY --from=builder /opt/keycloak /opt/keycloak
 
-# Setup keystore
-RUN /opt/jboss/tools/x509.sh
+WORKDIR /opt/keycloak
 
+# Allows server to start in prod mode. Actual certs provided by ALB.
+RUN keytool -genkeypair -storepass password -storetype PKCS12 -keyalg RSA -keysize 2048 -dname "CN=server" -alias server -ext "SAN:c=DNS:localhost,IP:127.0.0.1" -keystore conf/server.keystore
 # Customize entrypoint and config
-# NOTE: jboss/keycloak includes JDBC drivers.
-COPY docker-entrypoint.sh /opt/jboss/tools/docker-entrypoint.sh
-COPY standalone-ha.xml /opt/jboss/keycloak/standalone/configuration/standalone-ha.xml
-# https://www.keycloak.org/docs/latest/server_installation/index.html#profiles
-COPY profile.properties /opt/jboss/keycloak/standalone/configuration/profile.properties
-
-# Install custom themes
-RUN mkdir -p /opt/jboss/keycloak/themes
-COPY themes/ /opt/jboss/keycloak/themes/
-
-# Clustering
-ENV JGROUPS_DISCOVERY_PROTOCOL JDBC_PING
-ENV JGROUPS_DISCOVERY_PROPERTIES datasource_jndi_name=java:jboss/datasources/KeycloakDS
-# https://github.com/keycloak/keycloak-containers/blob/master/server/README.md#replication-and-fail-over
-ENV CACHE_OWNERS_COUNT 2
-ENV CACHE_OWNERS_AUTH_SESSIONS_COUNT 2
-# https://github.com/keycloak/keycloak-containers/blob/master/server/README.md#enabling-proxy-address-forwarding
-ENV PROXY_ADDRESS_FORWARDING true
+COPY docker-entrypoint.sh /docker-entrypoint.sh
 
 # Paranoia: Keycloak is not vulnerable to CVE-2021-44228
 # https://github.com/keycloak/keycloak-containers/issues/344
 # https://logging.apache.org/log4j/log4j-2.14.1/manual/configuration.html#SystemProperties
 ENV FORMAT_MESSAGES_PATTERN_DISABLE_LOOKUPS true
 
-EXPOSE 7600
-CMD ["-b", "0.0.0.0", "--server-config", "standalone-ha.xml"]
+# Port 7800 is used by JDBC_PING by default
+EXPOSE 7800
+ENTRYPOINT ["/docker-entrypoint.sh"]
