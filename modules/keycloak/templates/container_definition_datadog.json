@@ -15,7 +15,7 @@
       },
       {
         "protocol": "tcp",
-        "containerPort": 7600
+        "containerPort": 7800
       },
       {
         "protocol": "tcp",
@@ -25,24 +25,20 @@
     "cpu": ${container_cpu_units},
     "environment": [
       {
-        "name": "DB_ADDR",
+        "name": "KC_DB",
+        "value": "postgres"
+      },
+      {
+        "name": "KC_DB_URL",
+        "value": "jdbc:postgresql://${db_addr}:5432/keycloak"
+      },
+      {
+        "name": "KC_DB_ADDR",
         "value": "${db_addr}"
       },
       {
-        "name": "DB_DATABASE",
+        "name": "KC_DB_USERNAME",
         "value": "keycloak"
-      },
-      {
-        "name": "DB_PORT",
-        "value": "5432"
-      },
-      {
-        "name": "DB_USER",
-        "value": "keycloak"
-      },
-      {
-        "name": "DB_VENDOR",
-        "value": "postgres"
       },
       {
         "name": "DNS_NAME",
@@ -57,16 +53,32 @@
         "value": "-XX:+DisableExplicitGC -XX:+UseG1GC -Xms${jvm_heap_min}m -Xmx${jvm_heap_max}m -XX:MetaspaceSize=${jvm_meta_min}m -XX:MaxMetaspaceSize=${jvm_meta_max}m -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses -Djava.security.egd=file:/dev/urandom -Dnashorn.args=--no-deprecation-warning"
       },
       {
-        "name": "KEYCLOAK_DEFAULT_THEME",
-        "value": "keycloak"
-      },
-      {
-        "name": "KEYCLOAK_USER",
+        "name": "KEYCLOAK_ADMIN",
         "value": "keycloak_admin"
       },
       {
-        "name": "KEYCLOAK_LOGLEVEL",
-        "value": "INFO"
+        "name": "KC_LOG_LEVEL",
+        "value": "INFO,org.infinispan:ERROR,org.jgroups:ERROR"
+      },
+      {
+        "name": "KC_HTTP_ENABLED",
+        "value": "true"
+      },
+      {
+        "name": "KC_PROXY",
+        "value": "edge"
+      },
+      {
+        "name": "KC_HOSTNAME_STRICT",
+        "value": "false"
+      },
+      {
+        "name": "KC_HOSTNAME_PATH",
+        "value": "/auth"
+      },
+      {
+        "name": "KC_HTTP_RELATIVE_PATH",
+        "value": "/auth"
       },
       {
           "name": "ORG_MANAGER_HOST",
