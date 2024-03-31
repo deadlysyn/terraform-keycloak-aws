@@ -70,7 +70,7 @@ variable "db_maintenance_window" {
 }
 
 variable "deletion_protection" {
-  description = "Protect supporting resources from being deleted (ALB and RDS)"
+  description = "Protect supporting resources from being deleted (ALB, ECR, RDS)"
   type        = bool
   default     = false
 }

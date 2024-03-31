@@ -26,7 +26,6 @@ resource "random_password" "keycloak_password" {
 resource "aws_ssm_parameter" "db_password" {
   name        = "/${var.name}/${var.environment}/DB_PASSWORD"
   description = "RDS password for ${module.label.id}"
-  overwrite   = true
   tags        = module.label.tags
   type        = "SecureString"
   value       = random_password.db_password.result
@@ -35,7 +34,6 @@ resource "aws_ssm_parameter" "db_password" {
 resource "aws_ssm_parameter" "keycloak_password" {
   name        = "/${var.name}/${var.environment}/KEYCLOAK_PASSWORD"
   description = "keycloak_admin password for ${module.label.id}"
-  overwrite   = true
   tags        = module.label.tags
   type        = "SecureString"
   value       = random_password.keycloak_password.result
@@ -46,7 +44,7 @@ resource "aws_ssm_parameter" "keycloak_password" {
 ######################################################################
 
 module "alb" {
-  source                                  = "git::https://github.com/cloudposse/terraform-aws-alb.git?ref=tags/0.33.1"
+  source                                  = "git::https://github.com/cloudposse/terraform-aws-alb.git?ref=tags/1.11.1"
   alb_access_logs_s3_bucket_force_destroy = var.alb_destroy_log_bucket
   attributes                              = ["alb"]
   certificate_arn                         = var.alb_certificate_arn
@@ -103,8 +101,9 @@ resource "aws_ecs_cluster" "keycloak" {
 }
 
 module "ecr" {
-  source                     = "git::https://github.com/cloudposse/terraform-aws-ecr.git?ref=tags/0.32.3"
+  source                     = "git::https://github.com/cloudposse/terraform-aws-ecr.git?ref=tags/0.41.0"
   encryption_configuration   = var.encryption_configuration
+  force_delete               = var.deletion_protection ? false : true
   image_tag_mutability       = "MUTABLE"
   max_image_count            = 3
   name                       = "${var.name}-${var.environment}"
@@ -208,7 +207,7 @@ resource "aws_security_group" "vpc_endpoints" {
 data "aws_caller_identity" "current" {}
 
 module "ecs" {
-  source = "git::https://github.com/cloudposse/terraform-aws-ecs-alb-service-task.git?ref=tags/0.60.0"
+  source = "git::https://github.com/cloudposse/terraform-aws-ecs-alb-service-task.git?ref=tags/0.74.0"
   container_definition_json = templatefile("${path.module}/templates/container_definition.json", {
     aws_account_id            = data.aws_caller_identity.current.account_id
     container_cpu_units       = var.container_cpu_units
@@ -267,7 +266,7 @@ resource "aws_security_group_rule" "jdbc_ping" {
 ######################################################################
 
 module "rds_cluster" {
-  source                = "git::https://github.com/cloudposse/terraform-aws-rds-cluster.git?ref=tags/0.49.2"
+  source                = "git::https://github.com/cloudposse/terraform-aws-rds-cluster.git?ref=tags/1.9.0"
   admin_password        = random_password.db_password.result
   admin_user            = "keycloak"
   allowed_cidr_blocks   = var.db_allowed_cidr_blocks

@@ -34,7 +34,7 @@ resource "aws_nat_gateway" "main" {
 
 resource "aws_eip" "nat" {
   count      = 2
-  vpc        = true
+  domain     = "vpc"
   depends_on = [aws_internet_gateway.main]
   tags       = var.tags
 }
