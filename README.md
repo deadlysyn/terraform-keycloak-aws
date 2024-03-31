@@ -39,7 +39,6 @@ Psst: [Need IaC for your Keycloak clients?](https://github.com/deadlysyn/keycloa
 ## Prerequisites
 
 - [aws v2 CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
-- [aws-vault](https://github.com/99designs/aws-vault) installed and configured
 - Docker (container build/deploy)
 - UNIX-like OS (tested on Linux and MacOS)
 

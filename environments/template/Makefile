@@ -1,7 +1,4 @@
 REGION := $(AWS_REGION)
-VAULT_CMD := aws-vault exec $(AWS_PROFILE) --duration=1h --
-TF_CMD := terraform
-CMD := $(VAULT_CMD) $(TF_CMD)
 
 UNAME := $(shell uname)
 ifeq ($(UNAME), Darwin)
@@ -16,7 +13,7 @@ help:
 	@echo 'Manage Keycloak Infrastructure'
 	@echo ''
 	@echo 'Requirements:'
-	@echo '  aws-vault, terraform'
+	@echo '  terraform'
 	@echo ''
 	@echo 'Usage:'
 	@echo '  make all             create environment with remote state'
@@ -27,11 +24,10 @@ all: deps init applyandmigrate
 
 deps:
 	@echo 'Checking dependencies...'
-	@which aws-vault
 	@which terraform
 
 init:
-	$(CMD) init
+	terraform init
 
 applyprep:
 	@sed $(SED_ARGS) \
@@ -40,11 +36,11 @@ applyprep:
 		-e 's/\(force_destroy.*=\).*/\1 false/g' main.tf
 
 applyandmigrate: applyprep
-	$(CMD) apply -parallelism=20 -auto-approve
-	$(CMD) init -force-copy
+	terraform apply -parallelism=20 -auto-approve
+	terraform init -force-copy
 
 update: applyprep
-	$(CMD) apply -parallelism=20
+	terraform apply -parallelism=20
 
 destroyprep:
 	@sed $(SED_ARGS) \
@@ -53,9 +49,9 @@ destroyprep:
 		-e 's/\(force_destroy.*=\).*/\1 true/g' main.tf
 
 destroy: destroyprep
-	$(CMD) apply -target module.terraform_state_backend -auto-approve
-	$(CMD) init -force-copy
-	$(CMD) destroy -parallelism=20
+	terraform apply -target module.terraform_state_backend -auto-approve
+	terraform init -force-copy
+	terraform destroy -parallelism=20
 
 clean: applyprep
 	@rm -f backend.tf

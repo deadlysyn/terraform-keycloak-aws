@@ -5,7 +5,7 @@ help:
 	@echo 'Build and Deploy Keycloak'
 	@echo ''
 	@echo 'Requirements:'
-	@echo '  aws, aws-vault, docker, terraform'
+	@echo '  aws, docker, terraform'
 	@echo ''
 	@echo 'Usage:'
 	@echo '  make <target> ENV=<environment_name>'
@@ -18,7 +18,6 @@ help:
 deps:
 	@echo 'Checking dependencies...'
 	@which aws
-	@which aws-vault
 	@which docker
 	@which terraform
 

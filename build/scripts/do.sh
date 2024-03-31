@@ -5,7 +5,6 @@ set -eu
 BASENAME=$(basename "${0}")
 DIRNAME=$(dirname "${0}")
 REGION="${AWS_REGION}"
-VAULT="aws-vault exec ${AWS_PROFILE} --"
 
 build() {
   docker build -f "${DIRNAME}/../keycloak/Dockerfile" -t "${IMAGE}:latest" "${DIRNAME}/../keycloak"
@@ -13,10 +12,10 @@ build() {
 }
 
 deploy() {
-  ${VAULT} aws ecr get-login-password --region "${REGION}" \
+  aws ecr get-login-password --region "${REGION}" \
     | docker login --username AWS --password-stdin "${REPO_HOST}"
   docker push "${REPO}:latest"
-  ${VAULT} aws ecs update-service --region "${REGION}" \
+  aws ecs update-service --region "${REGION}" \
     --force-new-deployment --cluster "${CLUSTER}" --service "${CLUSTER}-svc"
 }
 

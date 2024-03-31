@@ -9,12 +9,9 @@
 ## Bootstrapping
 
 This document covers additional steps required when bootstrapping new environments.
-
 Before continuing, be sure you have installed the [prerequisites](https://github.com/deadlysyn/terraform-keycloak-aws#prerequisites).
 
-Automation wraps aws-vault for security. It needs [installed and configured](https://github.com/99designs/aws-vault#quick-start),
-so be sure you have a working AWS CLI profile and have imported credentials.
-Once CLIs are installed and you have an AWS profile ready, export the following
+Once AWS CLI v2 is installed and you have an AWS profile ready, export the following
 (or use something like [direnv](https://direnv.net) and a top-level `.envrc`
 to export automatically):
 
@@ -23,8 +20,8 @@ export AWS_REGION="<aws_region>"
 export AWS_PROFILE="<aws_profile>"
 ```
 
-The region and profile variables are used by Terraform as well
-as the the build and deploy scripts.
+The region and profile variables are used by Terraform as well as the the build
+and deploy scripts.
 
 ### Preparation
 
