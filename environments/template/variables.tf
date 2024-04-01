@@ -44,7 +44,7 @@ variable "db_backup_window" {
 variable "db_cluster_family" {
   description = "Family of DB cluster parameter group"
   type        = string
-  default     = "aurora-postgresql12"
+  default     = "aurora-postgresql15"
 }
 
 variable "db_cluster_size" {
@@ -55,7 +55,7 @@ variable "db_cluster_size" {
 variable "db_engine_version" {
   description = "Version of DB engine to use"
   type        = string
-  default     = "12.4"
+  default     = "15.4"
 }
 
 variable "db_instance_type" {
