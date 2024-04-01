@@ -1,7 +1,7 @@
 ##################################################
 # Step 1 - Build an optimized image
 ##################################################
-FROM quay.io/keycloak/keycloak:20.0.3 as builder
+FROM quay.io/keycloak/keycloak:24.0.1 as builder
 
 # These options can be modified to produce a different
 # optimized build.
@@ -26,16 +26,25 @@ COPY themes/ /opt/keycloak/themes
 RUN /opt/keycloak/bin/kc.sh build
 
 ##################################################
-# Step 2 - Copy optimized build into running image
+# Step 2 - Add required dependencies
+# https://www.keycloak.org/server/containers
 ##################################################
-FROM quay.io/keycloak/keycloak:20.0.3
+FROM registry.access.redhat.com/ubi9 AS ubi-micro-build
+RUN mkdir -p /mnt/rootfs
 
-# parses ecs metadata
+# curl and jq used to parse ecs metadata
+RUN dnf update -y && \
+    dnf install --installroot /mnt/rootfs curl jq --releasever 9 --setopt install_weak_deps=false --nodocs -y && \
+    dnf --installroot /mnt/rootfs clean all && \
+    rpm --root /mnt/rootfs -e --nodeps setup
+
+###################################################################
+# Step 3 - Copy optimized build and dependencies into running image
+###################################################################
+FROM quay.io/keycloak/keycloak:24.0.1
+
 USER root
-RUN microdnf update -y && \
-    microdnf install -y jq && \
-    microdnf clean all
-
+COPY --from=ubi-micro-build /mnt/rootfs /
 USER keycloak
 COPY --from=builder /opt/keycloak /opt/keycloak
 

@@ -22,5 +22,6 @@ if [ -z "${HOSTNAME}" ]; then
   HOSTNAME="localhost"
 fi
 
-exec /opt/keycloak/bin/kc.sh start --optimized "$@"
+# https://docs.aws.amazon.com/elasticloadbalancing/latest/application/x-forwarded-headers.html
+exec /opt/keycloak/bin/kc.sh start --optimized --proxy-headers xforwarded "$@"
 exit $?
