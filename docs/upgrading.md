@@ -1,5 +1,9 @@
 # Upgrades
 
+**NOTE:** This needs updated since Keycloak moved from Wildfly to Quarkus.
+The general process is the same, but configuration steps have changed to
+use `cache-ispn-jdbc-ping.xml` instead of `standalone-ha.xml`.
+
 Always [browse the upgrade guide](https://www.keycloak.org/docs/latest/upgrading/index.html),
 [read the release notes](https://www.keycloak.org/docs/latest/release_notes),
 and test in a low-risk environment first.
