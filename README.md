@@ -70,6 +70,13 @@ $ cd build
 $ make all ENV=<env_name>
 ```
 
+**NOTE:** Once deployed, Keycloak will be accessible via `<yourdomain>/auth`.
+Due to [this breaking change](https://github.com/keycloak/keycloak/discussions/10274)
+there is no longer an automatic redirect from `/` to `/auth`. Neither the provided
+environment variable nor build flag restore prior behavior as expected (I consider
+this a bug). I may update the ALB configuration to add this back, but have not
+done so yet. I welcome feedback on preferred approaches.
+
 ## Monitoring
 
 Since monitoring approaches vary, I've avoided codifying monitoring-specific opinions
