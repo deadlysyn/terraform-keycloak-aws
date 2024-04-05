@@ -12,7 +12,11 @@ ENV KC_METRICS_ENABLED=true
 ENV KC_HEALTH_ENABLED=true
 ENV KC_FEATURES=preview
 ENV KC_DB=postgres
-ENV KC_HTTP_RELATIVE_PATH=/auth
+
+# https://github.com/keycloak/keycloak/discussions/10274
+# https://stackoverflow.com/questions/73049385/keycloak18-index-page-resource-not-found
+# This no longer works cleanly, neither does passing --http-relative-path=/auth
+#ENV KC_HTTP_RELATIVE_PATH=/auth
 
 # # Clustering
 # (https://gist.github.com/xgp/768eea11f92806b9c83f95902f7f8f80)
@@ -34,9 +38,9 @@ RUN mkdir -p /mnt/rootfs
 
 # curl and jq used to parse ecs metadata
 RUN dnf update -y && \
-    dnf install --installroot /mnt/rootfs curl jq --releasever 9 --setopt install_weak_deps=false --nodocs -y && \
-    dnf --installroot /mnt/rootfs clean all && \
-    rpm --root /mnt/rootfs -e --nodeps setup
+  dnf install --installroot /mnt/rootfs curl jq --releasever 9 --setopt install_weak_deps=false --nodocs -y && \
+  dnf --installroot /mnt/rootfs clean all && \
+  rpm --root /mnt/rootfs -e --nodeps setup
 
 ###################################################################
 # Step 3 - Copy optimized build and dependencies into running image
