@@ -36,11 +36,11 @@ applyprep:
 		-e 's/\(force_destroy.*=\).*/\1 false/g' main.tf
 
 applyandmigrate: applyprep
-	terraform apply -parallelism=20 -auto-approve
+	terraform apply -auto-approve
 	terraform init -force-copy
 
 update: applyprep
-	terraform apply -parallelism=20
+	terraform apply
 
 destroyprep:
 	@sed $(SED_ARGS) \
@@ -51,7 +51,7 @@ destroyprep:
 destroy: destroyprep
 	terraform apply -target module.terraform_state_backend -auto-approve
 	terraform init -force-copy
-	terraform destroy -parallelism=20
+	terraform destroy
 
 clean: applyprep
 	@rm -f backend.tf
